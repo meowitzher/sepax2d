@@ -4,6 +4,6 @@ license = "MIT OR Apache-2.0"
 description = "A safe crate for finding and resolving collisions of convex polygons using the Separating Axis Theorem in two dimensions."
 version = "0.1.0"
 edition = "2021"
+repository = "https://github.com/meowitzher/sepax2d/"
 
 [dependencies]
-num = "0.4"
