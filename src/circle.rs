@@ -3,7 +3,21 @@
 /// # Examples
 /// 
 /// ```
+/// use sepax2d::circle::Circle;
+/// use sepax2d::polygon::Polygon;
+/// use sepax2d::{sat_overlap, sat_collision};
 /// 
+/// let circle1 = Circle::new((0.0, 0.0), 2.0);
+/// let circle2 = Circle::new((2.0, 2.0), 2.0);
+/// 
+/// let resolution = sat_collision(&circle1, &circle2);
+/// let difference = 2.0 * (f64::sqrt(2.0) - 1.0); // 2 root 2 - 2
+/// assert!(resolution.0 - difference < f64::EPSILON && resolution.0 - difference > -f64::EPSILON);
+/// assert!(resolution.1 - difference < f64::EPSILON && resolution.1 - difference > -f64::EPSILON);
+/// 
+/// let polygon = Polygon::from_vertices((0.0, 3.0), vec![(0.0, 0.0), (1.0, 0.0), (1.0, -1.5), (0.0, -1.5)]);
+/// assert!(sat_overlap(&polygon, &circle1));
+/// assert!(sat_overlap(&circle1, &polygon));
 /// ```
 pub struct Circle
 {
@@ -16,6 +30,7 @@ pub struct Circle
 impl Circle
 {
 
+    /// Create a new circle with given position and radius.
     pub fn new(position: (f64, f64), radius: f64) -> Circle
     {
 

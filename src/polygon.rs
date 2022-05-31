@@ -314,7 +314,8 @@ impl super::Shape for Polygon
         for (x, y) in self.vertices.iter()
         {
 
-            let dist_square = (*x - target.0) * (*x - target.0) + (*y - target.1) * (*y - target.1);
+            let position = (self.position.0 + *x, self.position.1 + *y);
+            let dist_square = (position.0 - target.0) * (position.0 - target.0) + (position.1 - target.1) * (position.1 - target.1);
 
             if dist_square < min
             {
