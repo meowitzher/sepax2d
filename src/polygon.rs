@@ -236,6 +236,7 @@ impl super::Shape for Polygon
     fn num_axes(&self) -> usize
     {
 
+        //We only perform collision check for polygons, not lines or points
         if self.vertices.len() <= 1
         {
 
@@ -255,7 +256,7 @@ impl super::Shape for Polygon
     }
 
 
-    fn get_axis(&self, index: usize) -> (f64, f64)
+    fn get_axis(&self, index: usize, _target: (f64, f64)) -> (f64, f64)
     {
 
         if self.vertices.len() <= 1 || index >= self.vertices.len()
@@ -275,7 +276,7 @@ impl super::Shape for Polygon
 
     }
 
-    fn project(&self, axis: (f64, f64)) -> (f64, f64)
+    fn project(&self, axis: (f64, f64), _normalize: bool) -> (f64, f64)
     {
 
         let mut min = f64::MAX;
@@ -294,6 +295,38 @@ impl super::Shape for Polygon
         }
 
         return (min, max);
+
+    }
+
+    fn needs_closest(&self) -> bool
+    {
+
+        return false;
+
+    }
+
+    fn get_closest(&self, target: (f64, f64)) -> (f64, f64)
+    {
+
+        let mut point = (0.0, 0.0);
+        let mut min = f64::MAX;
+
+        for (x, y) in self.vertices.iter()
+        {
+
+            let dist_square = (*x - target.0) * (*x - target.0) + (*y - target.1) * (*y - target.1);
+
+            if dist_square < min
+            {
+
+                point = (*x, *y);
+                min = dist_square;
+
+            }
+
+        }
+
+        return point;
 
     }
 
