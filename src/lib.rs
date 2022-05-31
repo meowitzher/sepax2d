@@ -2,6 +2,29 @@ pub mod polygon;
 
 use polygon::Polygon;
 
+/// A trait describing the behavior needed to implement SAT overlap and collision
+/// for a given shape.
+pub trait Shape
+{
+
+    /// The location of the shape in 2D space. 
+    fn position(&self) -> (f64, f64);
+
+    /// The number of axes the shape provides for testing. For polygons, it is
+    /// the same as the number of vertices, but for circles it is simply one. 
+    fn num_axes(&self) -> usize;
+
+    /// The method used to access the axes during the SAT calculations. This is
+    /// used to avoid the memory allocation of a new vector or array each time 
+    /// we calculate collisions.
+    fn get_axis(&self, index: usize) -> (f64, f64);
+
+    /// Getting the minimum and maximum projection of the shape onto the given axis
+    /// to look for overlap.
+    fn project(&self, axis: (f64, f64)) -> (f64, f64);
+
+}
+
 /// Returns true if the given polygons overlap, and false if they do not. Does not work for
 /// points or line segments.
 /// 
@@ -20,17 +43,17 @@ use polygon::Polygon;
 /// 
 /// assert!(sat_overlap(&square, &triangle));
 /// ```
-pub fn sat_overlap(left: &Polygon, right: &Polygon) -> bool
+pub fn sat_overlap(left: &impl Shape, right: &impl Shape) -> bool
 {
 
-    if !polygon_overlap(left, right, false).0
+    if !shape_overlap(left, right, false).0
     {
 
         return false;
 
     }
 
-    if !polygon_overlap(right, left, false).0
+    if !shape_overlap(right, left, false).0
     {
 
         return false;
@@ -41,8 +64,8 @@ pub fn sat_overlap(left: &Polygon, right: &Polygon) -> bool
 
 }
 
-/// Returns the vector that needs to be added to right's position to resolve a collision with left.
-/// Does not work for points or line segments.
+/// Returns the vector that needs to be added to the second polygon's position to resolve a collision with 
+/// the first polygon. Does not work for points or line segments.
 /// 
 /// If the polygons are not colliding, it returns the zero vector.
 /// 
@@ -65,11 +88,11 @@ pub fn sat_overlap(left: &Polygon, right: &Polygon) -> bool
 /// assert!(resolution.0 + 0.5 < f64::EPSILON && resolution.0 + 0.5 > -f64::EPSILON);
 /// assert!(resolution.1 < f64::EPSILON && resolution.1 > -f64::EPSILON);
 /// ```
-pub fn sat_collision(left: &Polygon, right: &Polygon) -> (f64, f64)
+pub fn sat_collision(left: &impl Shape, right: &Polygon) -> (f64, f64)
 {
 
-    let l_overlap = polygon_overlap(left, right, true);
-    let r_overlap = polygon_overlap(right, left, true);
+    let l_overlap = shape_overlap(left, right, true);
+    let r_overlap = shape_overlap(right, left, true);
 
     //Ensure that the vector points from left to right
     let r_flipped = (true, r_overlap.1, (-r_overlap.2.0, -r_overlap.2.1));
@@ -80,72 +103,60 @@ pub fn sat_collision(left: &Polygon, right: &Polygon) -> (f64, f64)
 
 }
 
-fn polygon_overlap(axes: &Polygon, projected: &Polygon, normalize: bool) -> (bool, f64, (f64, f64))
+fn shape_overlap(axes: &impl Shape, projected: &impl Shape, normalize: bool) -> (bool, f64, (f64, f64))
 {
 
     let mut min_overlap = f64::MAX;
     let mut min_axis = (0.0, 0.0);
 
     //We do not check line or point collisions
-    if axes.vertices.len() > 2 && projected.vertices.len() > 2
+    let num_axes = axes.num_axes();
+    for i in 0..num_axes
     {
 
-        if let Some((first_x, first_y)) = axes.vertices.first()
+        let mut axis = axes.get_axis(i);
+
+        //If we are just checking for overlap, we can skip normalizing the axis
+        if normalize
         {
 
-            let mut previous = (*first_x, *first_y);
-
-            for (x, y) in axes.vertices.iter().cycle().skip(1).take(axes.vertices.len())
+            let length = f64::sqrt((axis.0 * axis.0) + (axis.1 * axis.1));
+                    
+            if length > f64::EPSILON
             {
 
-                let side = (*x - previous.0, *y - previous.1);
-                let mut axis = (-side.1, side.0);
-
-                //If we are just checking for overlap, we can skip normalizing the axis
-                if normalize
-                {
-
-                    let length = f64::sqrt((axis.0 * axis.0) + (axis.1 * axis.1));
-                    
-                    if length > f64::EPSILON
-                    {
-
-                        axis = (axis.0 / length, axis.1 / length);
-
-                    }
-
-                }
-
-                let (min_l, max_l) = axes.project(axis);
-                let (min_r, max_r) = projected.project(axis);
-
-                //If there is no overlap, we can return early
-                if min_l > max_r - f64::EPSILON || min_r > max_l - f64::EPSILON
-                {
-
-                    return (false, 0.0, (0.0, 0.0)); 
-
-                }
-
-                let overlap = f64::min(max_l, max_r) - f64::max(min_l, min_r);
-                if overlap < min_overlap
-                {
-
-                    min_overlap = overlap;
-                    min_axis = axis;
-
-                }
-
-                previous = (*x, *y);
+                axis = (axis.0 / length, axis.1 / length);
 
             }
+
+        }
+
+        let (min_l, max_l) = axes.project(axis);
+        let (min_r, max_r) = projected.project(axis);
+
+        //If there is no overlap, we can return early
+        if min_l > max_r - f64::EPSILON || min_r > max_l - f64::EPSILON
+        {
+
+            return (false, 0.0, (0.0, 0.0)); 
+
+        }
+
+        let overlap = f64::min(max_l, max_r) - f64::max(min_l, min_r);
+        if overlap < min_overlap
+        {
+
+            min_overlap = overlap;
+            min_axis = axis;
 
         }
 
     }
 
     //Ensure that the chosen axis of penetration points from axes to projected
-    let difference = (projected.position.0 - axes.position.0, projected.position.1 - axes.position.1);
+    let axes_position = axes.position();
+    let projected_position = projected.position();
+    let difference = (projected_position.0 - axes_position.0, projected_position.1 - axes_position.1);
     if (difference.0 * min_axis.0 + difference.1 * min_axis.1) < -f64::EPSILON
     {
 

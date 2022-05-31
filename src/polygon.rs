@@ -221,7 +221,61 @@ impl Polygon
 
     }
 
-    pub fn project(&self, axis: (f64, f64)) -> (f64, f64)
+}
+
+impl super::Shape for Polygon
+{
+
+    fn position(&self) -> (f64, f64)
+    {
+
+        return self.position;
+
+    }
+
+    fn num_axes(&self) -> usize
+    {
+
+        if self.vertices.len() <= 1
+        {
+
+            return 0;
+
+        }
+
+        if self.vertices.len() == 2
+        {
+
+            return 1;
+
+        }
+
+        return self.vertices.len();
+
+    }
+
+
+    fn get_axis(&self, index: usize) -> (f64, f64)
+    {
+
+        if self.vertices.len() <= 1 || index >= self.vertices.len()
+        {
+
+            return (0.0, 0.0);
+
+        }
+
+        let vertex = self.vertices[index];
+        let next = self.vertices[(index + 1) % self.vertices.len()];
+
+        let side = (next.0 - vertex.0, next.1 - vertex.1);
+        let axis = (-side.1, side.0);
+
+        return axis;
+
+    }
+
+    fn project(&self, axis: (f64, f64)) -> (f64, f64)
     {
 
         let mut min = f64::MAX;
