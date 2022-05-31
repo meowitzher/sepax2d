@@ -338,6 +338,7 @@ mod polygon_tests
 {
 
     use super::*;
+    use crate::{float_equal, Shape};
 
     #[test]
     fn test_add_is_convex()
@@ -426,6 +427,70 @@ mod polygon_tests
         let concave = Polygon::convex_from_vertices((0.0, 0.0), vertices);
 
         assert!(concave.is_none());
+
+    }
+
+    #[test]
+    fn test_num_axes()
+    {
+
+        let empty = Polygon::new((1.0, 2.0));
+        let point = Polygon::from_vertices((0.0, 3.0), vec![(2.0, 1.0)]);
+        let line = Polygon::from_vertices((0.0, 0.0), vec![(0.0, 1.0), (0.0, 0.0)]);
+
+        let vertices = vec![(1.0, 1.0), (1.0, 2.0), (0.0, 3.0), (-1.0, 2.0), (-1.0, 1.0), (0.0, 0.0)];
+        let hexagon = Polygon::from_vertices((0.0, 0.0), vertices);
+
+        assert_eq!(empty.num_axes(), 0);
+        assert_eq!(point.num_axes(), 0);
+        assert_eq!(line.num_axes(), 1);
+        assert_eq!(hexagon.num_axes(), 6);
+
+
+    }
+
+    #[test]
+    fn test_get_axis()
+    {
+
+        let vertices = vec![(1.0, 1.0), (1.0, 2.0), (0.0, 3.0), (-1.0, 2.0), (-1.0, 1.0), (0.0, 0.0)];
+        let hexagon = Polygon::from_vertices((0.0, 0.0), vertices);
+
+        let axis1 = hexagon.get_axis(1, (0.0, 0.0));
+        let axis3 = hexagon.get_axis(3, (110.0, 11.0));
+        let axis4 = hexagon.get_axis(5, (-1.0, 1.0 / 16.0));
+
+        assert!(float_equal(axis1.0, -1.0));
+        assert!(float_equal(axis1.1, -1.0));
+        assert!(float_equal(axis3.0, 1.0));
+        assert!(float_equal(axis3.1, 0.0));
+        assert!(float_equal(axis4.0, -1.0));
+        assert!(float_equal(axis4.1, 1.0));
+
+    }
+
+    #[test]
+    fn test_project()
+    {
+
+        let vertices = vec![(1.0, 1.0), (1.0, 2.0), (0.0, 3.0), (-1.0, 2.0), (-1.0, 1.0), (0.0, 0.0)];
+        let hexagon = Polygon::from_vertices((0.0, 0.0), vertices);
+
+        let axis = (1.0, 2.0);
+        let projection = hexagon.project(axis, false);
+
+        assert!(float_equal(projection.0, 0.0));
+        assert!(float_equal(projection.1, 6.0));
+
+    }
+
+    #[test]
+    fn test_needs_closest()
+    {
+
+        let square = Polygon::from_vertices((1.0, 2.0), vec![(0.0, 0.0), (1.0, 0.0), (1.0, 1.0), (0.0, 1.0)]);
+
+        assert!(!square.needs_closest());
 
     }
 

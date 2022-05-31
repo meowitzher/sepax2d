@@ -182,6 +182,13 @@ fn shape_overlap(axes: &impl Shape, projected: &impl Shape, normalize: bool) -> 
 
 }
 
+fn float_equal(left: f64, right: f64) -> bool
+{
+
+    return (left - right).abs() < f64::EPSILON;
+
+}
+
 #[cfg(test)]
 mod sat_tests
 {
@@ -189,13 +196,6 @@ mod sat_tests
     use super::*;
     use super::polygon::Polygon;
     use super::circle::Circle;
-
-    fn float_equal(left: f64, right: f64) -> bool
-    {
-
-        return (left - right).abs() < f64::EPSILON;
-
-    }
 
     #[test]
     fn test_sat_overlap()

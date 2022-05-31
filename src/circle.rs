@@ -101,7 +101,66 @@ impl super::Shape for Circle
 
 }
 
-#[cfg(tests)]
+#[cfg(test)]
 mod circle_tests
 {
+
+    use super::*;
+    use crate::{float_equal, Shape};
+
+    #[test]
+    fn test_num_axes()
+    {
+
+        let circle = Circle::new((1.0, 2.0), 3.0);
+
+        assert_eq!(circle.num_axes(), 1);
+
+    }
+
+    #[test]
+    fn test_get_axis()
+    {
+
+        let circle = Circle::new((2.0, 3.0), 2.0);
+
+        let axis1 = circle.get_axis(0, (1.0, 0.0));
+        let axis2 = circle.get_axis(32, (13.0, 20.0));
+
+        assert!(float_equal(axis1.0, -1.0));
+        assert!(float_equal(axis1.1, -3.0));
+        assert!(float_equal(axis2.0, 11.0));
+        assert!(float_equal(axis2.1, 17.0));
+
+    }
+
+    #[test]
+    fn test_project()
+    {
+
+        let circle = Circle::new((1.0, 2.0), 2.0);
+
+        let axis1 = (1.0, 0.0);
+        let axis2 = (1.0, 1.0);
+
+        let projection1 = circle.project(axis1, true);
+        let projection2 = circle.project(axis2, false);
+
+        assert!(float_equal(projection1.0, -1.0));
+        assert!(float_equal(projection1.1, 3.0));
+        assert!(float_equal(projection2.0, 3.0 - 2.0 * f64::sqrt(2.0)));
+        assert!(float_equal(projection2.1, 3.0 + 2.0 * f64::sqrt(2.0)));
+
+    }
+
+    #[test]
+    fn test_needs_closest()
+    {
+
+        let circle = Circle::new((1.0, 2.0), 3.);
+
+        assert!(circle.needs_closest());
+
+    }
+
 }
