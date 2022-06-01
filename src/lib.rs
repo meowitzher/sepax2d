@@ -2,6 +2,7 @@
 
 pub mod polygon;
 pub mod circle;
+pub mod aabb;
 
 /// A trait describing the behavior needed to implement SAT overlap and collision
 /// for a given shape.
@@ -46,7 +47,8 @@ pub trait Shape
 /// # Examples
 /// 
 /// ```
-/// use sepax2d::{sat_overlap, polygon::Polygon};
+/// use sepax2d::sat_overlap;
+/// use sepax2d::polygon::Polygon;
 /// 
 /// let square = Polygon::from_vertices((1.0, 1.0), vec![(-1.0, 1.0), (1.0, 1.0), (1.0, -1.0), (-1.0, -1.0)]);
 /// let triangle = Polygon::from_vertices((0.0, 0.0), vec![(2.0, 2.0), (0.0, -2.0), (-1.0, 0.0)]);
@@ -87,16 +89,26 @@ pub fn sat_overlap(left: &impl Shape, right: &impl Shape) -> bool
 /// # Examples
 /// 
 /// ```
-/// use sepax2d::{sat_collision, polygon::Polygon};
+/// use sepax2d::{sat_collision, polygon::Polygon, aabb::AABB};
 /// 
 /// let square = Polygon::from_vertices((1.0, 1.0), vec![(-1.0, 1.0), (1.0, 1.0), (1.0, -1.0), (-1.0, -1.0)]);
 /// let triangle = Polygon::from_vertices((-3.5, 1.0), vec![(4.0, 0.0), (0.0, 6.0), (-4.0, 0.0)]);
+/// 
+/// let aabb = AABB::new((0.0, 2.0), 2.0, 2.0);
 /// 
 /// let resolution = sat_collision(&square, &triangle);
 /// //resolution = (-0.5, 0.0) up to floating point error
 /// 
 /// assert!(resolution.0 + 0.5 < f64::EPSILON && resolution.0 + 0.5 > -f64::EPSILON);
 /// assert!(resolution.1 < f64::EPSILON && resolution.1 > -f64::EPSILON);
+/// 
+/// let aabb_resolution = sat_collision(&aabb, &triangle);
+/// //resolution = (-0.5, 0.0) up to floating point error. aabb is a different way to
+/// //represent the same shape as square
+/// 
+/// assert!(resolution.0 + 0.5 < f64::EPSILON && resolution.0 + 0.5 > -f64::EPSILON);
+/// assert!(resolution.1 < f64::EPSILON && resolution.1 > -f64::EPSILON);
+/// 
 /// ```
 pub fn sat_collision(left: &impl Shape, right: &impl Shape) -> (f64, f64)
 {
@@ -147,6 +159,9 @@ fn shape_overlap(axes: &impl Shape, projected: &impl Shape, normalize: bool) -> 
         let (min_l, max_l) = axes.project(axis, normalize);
         let (min_r, max_r) = projected.project(axis, normalize);
 
+        println!("{:?}", axis);
+        println!("{:?}, {:?}, {:?}, {:?}", min_l, max_l, min_r, max_r);
+
         //If there is no overlap, we can return early
         if min_l > max_r - f64::EPSILON || min_r > max_l - f64::EPSILON
         {
@@ -182,6 +197,55 @@ fn shape_overlap(axes: &impl Shape, projected: &impl Shape, normalize: bool) -> 
 
 }
 
+fn project(position: (f64, f64), axis: (f64, f64), points: &[(f64, f64)]) -> (f64, f64)
+{
+
+    let mut min = f64::MAX;
+    let mut max = f64::MIN;
+
+    for (x, y) in points
+    {
+
+        let position = (position.0 + *x, position.1 + *y);
+
+        let projection = (position.0 * axis.0) + (position.1 * axis.1);
+
+        min = f64::min(min, projection);
+        max = f64::max(max, projection);
+
+    }
+
+    return (min, max);
+
+}
+
+fn closest(position: (f64, f64), target: (f64, f64), points: &[(f64, f64)]) -> (f64, f64)
+{
+
+    let mut point = (0.0, 0.0);
+    let mut min = f64::MAX;
+
+    for (x, y) in points
+    {
+
+        let position = (position.0 + *x, position.1 + *y);
+        let dist_square = (position.0 - target.0) * (position.0 - target.0) + (position.1 - target.1) * (position.1 - target.1);
+
+        if dist_square < min
+        {
+
+            point = (*x, *y);
+            min = dist_square;
+
+        }
+
+    }
+
+    return point;
+
+}
+
+#[allow(dead_code)]
 fn float_equal(left: f64, right: f64) -> bool
 {
 

@@ -279,22 +279,7 @@ impl super::Shape for Polygon
     fn project(&self, axis: (f64, f64), _normalize: bool) -> (f64, f64)
     {
 
-        let mut min = f64::MAX;
-        let mut max = f64::MIN;
-
-        for (x, y) in self.vertices.iter()
-        {
-
-            let position = (self.position.0 + *x, self.position.1 + *y);
-
-            let projection = (position.0 * axis.0) + (position.1 * axis.1);
-
-            min = f64::min(min, projection);
-            max = f64::max(max, projection);
-
-        }
-
-        return (min, max);
+        return super::project(self.position, axis, &self.vertices);
 
     }
 
@@ -308,26 +293,7 @@ impl super::Shape for Polygon
     fn get_closest(&self, target: (f64, f64)) -> (f64, f64)
     {
 
-        let mut point = (0.0, 0.0);
-        let mut min = f64::MAX;
-
-        for (x, y) in self.vertices.iter()
-        {
-
-            let position = (self.position.0 + *x, self.position.1 + *y);
-            let dist_square = (position.0 - target.0) * (position.0 - target.0) + (position.1 - target.1) * (position.1 - target.1);
-
-            if dist_square < min
-            {
-
-                point = (*x, *y);
-                min = dist_square;
-
-            }
-
-        }
-
-        return point;
+        return super::closest(self.position, target, &self.vertices);
 
     }
 
