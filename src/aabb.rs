@@ -24,9 +24,10 @@
 pub struct AABB
 {
 
-    position: (f64, f64),
-    width: f64,
-    height: f64
+    pub position: (f64, f64),
+    pub width: f64,
+    pub height: f64
+    
 
 }
 
@@ -44,6 +45,7 @@ impl AABB
     fn points(&self) -> [(f64, f64); 4]
     {
 
+        //TODO: Determine if this needs to be optimized or if the compiler does it for us
         return 
         [
             
