@@ -60,7 +60,7 @@ impl AABB
 
 }
 
-impl super::Shape for AABB
+impl crate::Shape for AABB
 {
 
     fn position(&self) -> (f64, f64)
@@ -80,25 +80,24 @@ impl super::Shape for AABB
     fn get_axis(&self, index: usize, _target: (f64, f64)) -> (f64, f64)
     {
 
-        if index == 0
+        return match index
         {
 
-            return (1.0, 0.0);
-
-        }
-
-        return (0.0, 1.0);
+            0 => (1.0, 0.0),
+            _ => (0.0, 1.0)
+            
+        };
 
     }
 
     fn project(&self, axis: (f64, f64), _normalize: bool) -> (f64, f64)
     {
 
-        return super::project(self.position, axis, &self.points());
+        return crate::project(self.position, axis, &self.points());
 
     }
 
-    fn needs_closest(&self) -> bool
+    fn needs_closest(&self, _index: usize) -> bool
     {
 
         return false;
@@ -108,7 +107,14 @@ impl super::Shape for AABB
     fn get_closest(&self, target: (f64, f64)) -> (f64, f64)
     {
 
-        return super::closest(self.position, target, &self.points());
+        return crate::closest(self.position, target, &self.points());
+
+    }
+
+    fn point(&self, _index: usize) -> (f64, f64)
+    {
+
+        return self.position;
 
     }
 
@@ -172,7 +178,7 @@ mod aabb_tests
 
         let aabb = AABB::new((1.0, 2.0), 3.0, 2.0);
 
-        assert!(!aabb.needs_closest());
+        assert!(!aabb.needs_closest(1));
 
     }
 

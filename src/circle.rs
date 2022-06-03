@@ -40,7 +40,7 @@ impl Circle
 
 }
 
-impl super::Shape for Circle
+impl crate::Shape for Circle
 {
 
     fn position(&self) -> (f64, f64)
@@ -56,7 +56,6 @@ impl super::Shape for Circle
         return 1;
 
     }
-
 
     fn get_axis(&self, _index: usize, target: (f64, f64)) -> (f64, f64)
     {
@@ -85,7 +84,7 @@ impl super::Shape for Circle
 
     }
 
-    fn needs_closest(&self) -> bool
+    fn needs_closest(&self, _index: usize) -> bool
     {
 
         return true;
@@ -93,6 +92,13 @@ impl super::Shape for Circle
     }
 
     fn get_closest(&self, _target: (f64, f64)) -> (f64, f64)
+    {
+
+        return self.position;
+
+    }
+
+    fn point(&self, _index: usize) -> (f64, f64)
     {
 
         return self.position;
@@ -159,7 +165,7 @@ mod circle_tests
 
         let circle = Circle::new((1.0, 2.0), 3.);
 
-        assert!(circle.needs_closest());
+        assert!(circle.needs_closest(3));
 
     }
 

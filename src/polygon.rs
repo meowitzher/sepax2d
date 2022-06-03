@@ -223,7 +223,7 @@ impl Polygon
 
 }
 
-impl super::Shape for Polygon
+impl crate::Shape for Polygon
 {
 
     fn position(&self) -> (f64, f64)
@@ -279,11 +279,11 @@ impl super::Shape for Polygon
     fn project(&self, axis: (f64, f64), _normalize: bool) -> (f64, f64)
     {
 
-        return super::project(self.position, axis, &self.vertices);
+        return crate::project(self.position, axis, &self.vertices);
 
     }
 
-    fn needs_closest(&self) -> bool
+    fn needs_closest(&self, _index: usize) -> bool
     {
 
         return false;
@@ -293,7 +293,22 @@ impl super::Shape for Polygon
     fn get_closest(&self, target: (f64, f64)) -> (f64, f64)
     {
 
-        return super::closest(self.position, target, &self.vertices);
+        return crate::closest(self.position, target, &self.vertices);
+
+    }
+
+    fn point(&self, index: usize) -> (f64, f64)
+    {
+
+        if index >= self.vertices.len()
+        {
+
+            return self.position;
+
+        }
+
+        let vertex = self.vertices[index];
+        return (self.position.0 + vertex.0, self.position.1 + vertex.1);
 
     }
 
@@ -456,7 +471,7 @@ mod polygon_tests
 
         let square = Polygon::from_vertices((1.0, 2.0), vec![(0.0, 0.0), (1.0, 0.0), (1.0, 1.0), (0.0, 1.0)]);
 
-        assert!(!square.needs_closest());
+        assert!(!square.needs_closest(2));
 
     }
 

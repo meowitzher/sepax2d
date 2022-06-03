@@ -3,6 +3,7 @@
 pub mod polygon;
 pub mod circle;
 pub mod aabb;
+pub mod capsule;
 
 /// A trait describing the behavior needed to implement SAT overlap and collision
 /// for a given shape.
@@ -28,11 +29,14 @@ pub trait Shape
 
     /// Determine whether or not the shape needs access to the closest vertex of 
     /// another shape to check collisions
-    fn needs_closest(&self) -> bool;
+    fn needs_closest(&self, index: usize) -> bool;
 
     /// Gets the closest vertex/primary point/position to the given target, NOT the closest point
     /// on the shape.
     fn get_closest(&self, target: (f64, f64)) -> (f64, f64);
+
+    /// The point corresponding to the given axis, if applicable. Otherwise, position.
+    fn point(&self, index: usize) -> (f64, f64);
 
 }
 
@@ -89,7 +93,9 @@ pub fn sat_overlap(left: &impl Shape, right: &impl Shape) -> bool
 /// # Examples
 /// 
 /// ```
-/// use sepax2d::{sat_collision, polygon::Polygon, aabb::AABB};
+/// use sepax2d::sat_collision;
+/// use sepax2d::polygon::Polygon;
+/// use sepax2d::aabb::AABB;
 /// 
 /// let square = Polygon::from_vertices((1.0, 1.0), vec![(-1.0, 1.0), (1.0, 1.0), (1.0, -1.0), (-1.0, -1.0)]);
 /// let triangle = Polygon::from_vertices((-3.5, 1.0), vec![(4.0, 0.0), (0.0, 6.0), (-4.0, 0.0)]);
@@ -135,10 +141,8 @@ fn shape_overlap(axes: &impl Shape, projected: &impl Shape, normalize: bool) -> 
     for i in 0..num_axes
     {
 
-        let closest = if axes.needs_closest() { projected.get_closest(axes.position()) } else { (0.0, 0.0) };
+        let closest = if axes.needs_closest(i) { projected.get_closest(axes.point(i)) } else { (0.0, 0.0) };
         let mut axis = axes.get_axis(i, closest);
-
-        //println!("{:?}", axis);
 
         //If we are just checking for overlap, we can skip normalizing the axis. However,
         //we need to normalize to find the minimum penetration vector.
@@ -158,9 +162,6 @@ fn shape_overlap(axes: &impl Shape, projected: &impl Shape, normalize: bool) -> 
 
         let (min_l, max_l) = axes.project(axis, normalize);
         let (min_r, max_r) = projected.project(axis, normalize);
-
-        println!("{:?}", axis);
-        println!("{:?}, {:?}, {:?}, {:?}", min_l, max_l, min_r, max_r);
 
         //If there is no overlap, we can return early
         if min_l > max_r - f64::EPSILON || min_r > max_l - f64::EPSILON
@@ -234,7 +235,7 @@ fn closest(position: (f64, f64), target: (f64, f64), points: &[(f64, f64)]) -> (
         if dist_square < min
         {
 
-            point = (*x, *y);
+            point = position;
             min = dist_square;
 
         }
@@ -260,6 +261,8 @@ mod sat_tests
     use super::*;
     use super::polygon::Polygon;
     use super::circle::Circle;
+    use super::aabb::AABB;
+    use super::capsule::Capsule;
 
     #[test]
     fn test_sat_overlap()
@@ -358,6 +361,30 @@ mod sat_tests
         let resolution6 = sat_collision(&circle2, &circle);
         assert!(float_equal(resolution6.0, 0.1));
         assert!(float_equal(resolution6.1, 0.0));
+
+    }
+
+    #[test]
+    fn test_capsule_collision()
+    {
+
+        let capsule = Capsule::new((0.0, 0.0), (0.0, 2.0), 2.0);
+
+        let triangle = Polygon::from_vertices((0.0, 5.0), vec![(0.0, -2.0), (-1.0, 2.0), (1.0, 2.0)]);
+        let rectangle = AABB::new((-4.0, 4.0), 2.5, 0.5);
+        let circle1 = Circle::new((2.0, -2.5), 1.0);
+        let circle2 = Circle::new((3.0, 0.0), 1.5);
+
+        assert!(sat_overlap(&capsule, &circle1));
+        assert!(!sat_overlap(&rectangle, &capsule));
+
+        let resolution1 = sat_collision(&circle2, &capsule);
+        let resolution2 = sat_collision(&capsule, &triangle);
+
+        assert!(float_equal(resolution1.0, -0.5));
+        assert!(float_equal(resolution1.1, 0.0));
+        assert!(float_equal(resolution2.0, 0.0));
+        assert!(float_equal(resolution2.1, 1.0));
 
     }
 
