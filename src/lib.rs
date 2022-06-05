@@ -43,13 +43,13 @@ pub trait Shape
 
 }
 
-/// Returns true if the given polygons overlap, and false if they do not. Does not work for
-/// points or line segments.
+/// Returns true if the given shapes overlap, and false if they do not. Does not work for
+/// degenerate polygons.
 /// 
 /// This method performs a floating point comparison with Rust's built in epsilon constant, so it may
-/// return the incorrect answer for polygons which are very small or very close together.
+/// return the incorrect answer for shapes which are very small or very close together.
 /// 
-/// Requires both polygons to be convex.
+/// Requires both shapes to be convex.
 /// 
 /// # Examples
 /// 
@@ -83,15 +83,15 @@ pub fn sat_overlap(left: &impl Shape, right: &impl Shape) -> bool
 
 }
 
-/// Returns the vector that needs to be added to the second polygon's position to resolve a collision with 
-/// the first polygon. Does not work for points or line segments.
+/// Returns the vector that needs to be added to the second shape's position to resolve a collision with 
+/// the first shape. Does not work for degenerate polygons.
 /// 
-/// If the polygons are not colliding, it returns the zero vector.
+/// If the shapes are not colliding, it returns the zero vector.
 /// 
 /// This method performs a floating point comparison with Rust's built in epsilon constant, so it may
-/// return the incorrect answer for polygons which are very small or very close together.
+/// return the incorrect answer for shapes which are very small or very close together.
 /// 
-/// Requires both polygons to be convex.
+/// Requires both shapes to be convex.
 /// 
 /// # Examples
 /// 
@@ -134,7 +134,26 @@ pub fn sat_collision(left: &impl Shape, right: &impl Shape) -> (f32, f32)
 
 }
 
-
+/// Returns true if the given shape contains the specified point, and false if 
+/// it does not. Does not work for degenerate polygons.
+/// 
+/// This method performs a floating point comparison with Rust's built in epsilon constant, so it may
+/// return the incorrect answer for shapes which are very small or very close to the point.
+/// 
+/// Requires the shape to be convex.
+/// 
+/// # Examples
+/// 
+/// ```
+/// use sepax2d::contains_point;
+/// use sepax2d::polygon::Polygon;
+/// 
+/// let square = Polygon::from_vertices((1.0, 1.0), vec![(-1.0, 1.0), (1.0, 1.0), (1.0, -1.0), (-1.0, -1.0)]);
+/// let triangle = Polygon::from_vertices((0.0, 0.0), vec![(2.0, 2.0), (0.0, -2.0), (-1.0, 0.0)]);
+/// 
+/// assert!(contains_point(&triangle, (0.5, 0.5)));
+/// assert!(!contains_point(&square, (-2.0, 2.0)));
+/// ```
 pub fn contains_point(shape: &impl Shape, point: (f32, f32)) -> bool
 {
 
