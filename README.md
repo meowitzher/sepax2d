@@ -1,5 +1,5 @@
 # sepax2d
-A safe Rust crate for finding and resolving collisions of convex polygons using the Separating Axis Theorem (SAT) in two dimensions.
+A safe Rust crate for finding and resolving collisions of convex shapes using the Separating Axis Theorem (SAT) in two dimensions.
 
 ### Usage
 
