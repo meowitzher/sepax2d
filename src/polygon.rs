@@ -38,8 +38,8 @@
 pub struct Polygon
 {
 
-    pub position: (f64, f64),
-    pub vertices: Vec::<(f64,f64)>
+    pub position: (f32, f32),
+    pub vertices: Vec::<(f32,f32)>
 
 }
 
@@ -55,7 +55,7 @@ impl Polygon
     /// 
     /// let point = Polygon::new((17.0, 5.0));
     /// ```
-    pub fn new(position: (f64, f64)) -> Polygon
+    pub fn new(position: (f32, f32)) -> Polygon
     {
 
         return Polygon { position, vertices: Vec::new() };
@@ -107,7 +107,7 @@ impl Polygon
 
                     let (min, max) = self.side_projection(axis, i + 1);
 
-                    if min < -f64::EPSILON && max > f64::EPSILON
+                    if min < -f32::EPSILON && max > f32::EPSILON
                     {
 
                         //There are points on both sides of a polygon edge, which must mean it is not convex
@@ -128,11 +128,11 @@ impl Polygon
 
     }
 
-    fn side_projection(&self, axis: (f64, f64), start: usize) -> (f64, f64)
+    fn side_projection(&self, axis: (f32, f32), start: usize) -> (f32, f32)
     {
 
-        let mut min = f64::MAX;
-        let mut max = f64::MIN;
+        let mut min = f32::MAX;
+        let mut max = f32::MIN;
 
         //Project all vertices not touching the given side onto the given axis
         for (x, y) in self.vertices.iter().cycle().skip(start + 1).take(self.vertices.len() - 2)
@@ -141,8 +141,8 @@ impl Polygon
             //Dot product the current position vector to the axis of projection
             let projection = (*x * axis.0) + (*y * axis.1);
 
-            min = f64::min(min, projection);
-            max = f64::max(max, projection);
+            min = f32::min(min, projection);
+            max = f32::max(max, projection);
 
         }
 
@@ -162,7 +162,7 @@ impl Polygon
     /// 
     /// polygon.add((0.0, 2.0)) //Square with vertices (0, 0), (2, 0), (2, 2), and (0, 2)
     /// ```
-    pub fn add(&mut self, vertex: (f64, f64))
+    pub fn add(&mut self, vertex: (f32, f32))
     {
 
         self.vertices.push(vertex);
@@ -180,7 +180,7 @@ impl Polygon
     /// let rectangle = Polygon::from_vertices((0.0, 0.0), vertices); 
     /// //Rectangle with vertices (0,0), (2,0), (2,1), and (0, 1)
     /// ```
-    pub fn from_vertices(position: (f64, f64), vertices: Vec<(f64, f64)>) -> Polygon
+    pub fn from_vertices(position: (f32, f32), vertices: Vec<(f32, f32)>) -> Polygon
     {
 
         return Polygon { position, vertices };
@@ -205,7 +205,7 @@ impl Polygon
     /// 
     /// assert!(concave_shape.is_none());
     /// ```
-    pub fn convex_from_vertices(position: (f64, f64), vertices: Vec<(f64, f64)>) -> Option<Polygon>
+    pub fn convex_from_vertices(position: (f32, f32), vertices: Vec<(f32, f32)>) -> Option<Polygon>
     {
 
         let polygon = Polygon { position, vertices };
@@ -226,10 +226,17 @@ impl Polygon
 impl crate::Shape for Polygon
 {
 
-    fn position(&self) -> (f64, f64)
+    fn position(&self) -> (f32, f32)
     {
 
         return self.position;
+
+    }
+
+    fn set_position(&mut self, position: (f32, f32))
+    {
+
+        self.position = position;
 
     }
 
@@ -256,7 +263,7 @@ impl crate::Shape for Polygon
     }
 
 
-    fn get_axis(&self, index: usize, _target: (f64, f64)) -> (f64, f64)
+    fn get_axis(&self, index: usize, _target: (f32, f32)) -> (f32, f32)
     {
 
         if self.vertices.len() <= 1 || index >= self.vertices.len()
@@ -276,7 +283,7 @@ impl crate::Shape for Polygon
 
     }
 
-    fn project(&self, axis: (f64, f64), _normalize: bool) -> (f64, f64)
+    fn project(&self, axis: (f32, f32), _normalize: bool) -> (f32, f32)
     {
 
         return crate::project(self.position, axis, &self.vertices);
@@ -290,14 +297,14 @@ impl crate::Shape for Polygon
 
     }
 
-    fn get_closest(&self, target: (f64, f64)) -> (f64, f64)
+    fn get_closest(&self, target: (f32, f32)) -> (f32, f32)
     {
 
         return crate::closest(self.position, target, &self.vertices);
 
     }
 
-    fn point(&self, index: usize) -> (f64, f64)
+    fn point(&self, index: usize) -> (f32, f32)
     {
 
         if index >= self.vertices.len()

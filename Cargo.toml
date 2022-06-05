@@ -7,3 +7,19 @@ edition = "2021"
 repository = "https://github.com/meowitzher/sepax2d/"
 
 [dependencies]
+
+[dev-dependencies]
+ggez = "0.7"
+
+[[example]]
+name = "dynamic"
+path = "examples/dynamic.rs"
+crate-type = ["staticlib"]
+
+[[example]]
+name = "overlap"
+path = "examples/overlap.rs"
+
+[[example]]
+name = "collision"
+path = "examples/collision.rs"

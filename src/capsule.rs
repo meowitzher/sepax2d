@@ -25,10 +25,10 @@ use crate::circle::Circle;
 pub struct Capsule
 {
 
-    pub position: (f64, f64),
-    arm: (f64, f64),
-    perp: (f64, f64),
-    pub radius: f64
+    pub position: (f32, f32),
+    arm: (f32, f32),
+    perp: (f32, f32),
+    pub radius: f32
 
 }
 
@@ -36,20 +36,20 @@ impl Capsule
 {
 
     /// Create a new capsule with the given center position, arm, and radius. 
-    pub fn new(position: (f64, f64), arm: (f64, f64), radius: f64) -> Capsule 
+    pub fn new(position: (f32, f32), arm: (f32, f32), radius: f32) -> Capsule 
     {
 
         return Capsule { position, arm, radius, perp: Capsule::set_perp(arm, radius) };
 
     }
 
-    fn set_perp(arm: (f64, f64), radius: f64) -> (f64, f64)
+    fn set_perp(arm: (f32, f32), radius: f32) -> (f32, f32)
     {
 
-        let length = f64::sqrt((arm.0 * arm.0) + (arm.1 * arm.1));
+        let length = f32::sqrt((arm.0 * arm.0) + (arm.1 * arm.1));
         let mut perp = (-arm.1, arm.0);
 
-        if length > f64::EPSILON
+        if length > f32::EPSILON
         {
 
             perp = ((perp.0 * radius) / length, (perp.1 * radius) / length);
@@ -61,7 +61,7 @@ impl Capsule
     }
 
     /// Used to change the radius of the capsule.
-    pub fn set_radius(&mut self, radius: f64)
+    pub fn set_radius(&mut self, radius: f32)
     {
 
         self.radius = radius;
@@ -70,9 +70,17 @@ impl Capsule
 
     }
 
+    /// Used to access the radius of the capsule.
+    pub fn radius(&self) -> f32
+    {
+
+        return self.radius;
+
+    }
+
     /// Used to change the arm of the capsule. Remember that the arm
     /// is half of the capsule's length, not the entire length.
-    pub fn set_arm(&mut self, arm: (f64, f64))
+    pub fn set_arm(&mut self, arm: (f32, f32))
     {
 
         self.arm = arm;
@@ -81,7 +89,24 @@ impl Capsule
 
     }
 
-    fn points(&self) -> [(f64, f64); 6]
+    ///Used to access the arm vector of the capsule.
+    pub fn arm(&self) -> (f32, f32)
+    {
+
+        return self.arm;
+
+    }
+
+    ///Used to access the vector perpendicular to the capsule. Set
+    ///by the values of radius and arm.
+    pub fn perp(&self) -> (f32, f32)
+    {
+
+        return self.perp;
+
+    }
+
+    fn points(&self) -> [(f32, f32); 6]
     {
 
         //TODO: Determine if this needs to be optimized or if the compiler does it for us
@@ -104,13 +129,20 @@ impl Capsule
 impl crate::Shape for Capsule
 {
 
-    fn position(&self) -> (f64, f64)
+    fn position(&self) -> (f32, f32)
     {
 
         return self.position;
 
     }
 
+    fn set_position(&mut self, position: (f32, f32))
+    {
+
+        self.position = position;
+
+    }
+    
     fn num_axes(&self) -> usize
     {
 
@@ -119,7 +151,7 @@ impl crate::Shape for Capsule
     }
 
 
-    fn get_axis(&self, index: usize, target: (f64, f64)) -> (f64, f64)
+    fn get_axis(&self, index: usize, target: (f32, f32)) -> (f32, f32)
     {
 
         return match index
@@ -135,7 +167,7 @@ impl crate::Shape for Capsule
 
     }
 
-    fn project(&self, axis: (f64, f64), normalize: bool) -> (f64, f64)
+    fn project(&self, axis: (f32, f32), normalize: bool) -> (f32, f32)
     {
 
         let circle1 = Circle::new((self.position.0 + self.arm.0, self.position.1 + self.arm.1), self.radius);
@@ -144,7 +176,7 @@ impl crate::Shape for Capsule
         let projection1 = circle1.project(axis, normalize);
         let projection2 = circle2.project(axis, normalize);
 
-        return (f64::min(projection1.0, projection2.0), f64::max(projection1.1, projection2.1));
+        return (f32::min(projection1.0, projection2.0), f32::max(projection1.1, projection2.1));
 
     }
 
@@ -163,14 +195,14 @@ impl crate::Shape for Capsule
 
     }
 
-    fn get_closest(&self, target: (f64, f64)) -> (f64, f64)
+    fn get_closest(&self, target: (f32, f32)) -> (f32, f32)
     {
 
         return crate::closest(self.position, target, &self.points());
 
     }
 
-    fn point(&self, index: usize) -> (f64, f64)
+    fn point(&self, index: usize) -> (f32, f32)
     {
 
         return match index
@@ -240,8 +272,8 @@ mod capsule_tests
 
         assert!(float_equal(projection1.0, -1.0));
         assert!(float_equal(projection1.1, 5.0));
-        assert!(float_equal(projection2.0, 2.0 - 2.0 * f64::sqrt(5.0)));
-        assert!(float_equal(projection2.1, 4.0 + 2.0 * f64::sqrt(5.0)));
+        assert!(float_equal(projection2.0, 2.0 - 2.0 * f32::sqrt(5.0)));
+        assert!(float_equal(projection2.1, 4.0 + 2.0 * f32::sqrt(5.0)));
 
     }
 

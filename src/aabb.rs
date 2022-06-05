@@ -18,15 +18,15 @@
 /// assert!(sat_overlap(&box2, &box1));
 /// 
 /// let resolution = sat_collision(&box1, &box3);
-/// assert!(resolution.0 - 2.0 < f64::EPSILON && resolution.0 - 2.0 > -f64::EPSILON);
-/// assert!(resolution.1 - 0.0 < f64::EPSILON && resolution.1 - 0.0 > -f64::EPSILON);
+/// assert!(resolution.0 - 2.0 < f32::EPSILON && resolution.0 - 2.0 > -f32::EPSILON);
+/// assert!(resolution.1 - 0.0 < f32::EPSILON && resolution.1 - 0.0 > -f32::EPSILON);
 /// ```
 pub struct AABB
 {
 
-    pub position: (f64, f64),
-    pub width: f64,
-    pub height: f64
+    pub position: (f32, f32),
+    pub width: f32,
+    pub height: f32
     
 
 }
@@ -35,14 +35,14 @@ impl AABB
 {
 
     /// Create a new AABB at the given position with the given width and height.
-    pub fn new(position: (f64, f64), width: f64, height: f64) -> AABB
+    pub fn new(position: (f32, f32), width: f32, height: f32) -> AABB
     {
 
         return AABB { position, width, height };
 
     }
 
-    fn points(&self) -> [(f64, f64); 4]
+    fn points(&self) -> [(f32, f32); 4]
     {
 
         //TODO: Determine if this needs to be optimized or if the compiler does it for us
@@ -63,13 +63,20 @@ impl AABB
 impl crate::Shape for AABB
 {
 
-    fn position(&self) -> (f64, f64)
+    fn position(&self) -> (f32, f32)
     {
 
         return self.position;
 
     }
 
+    fn set_position(&mut self, position: (f32, f32))
+    {
+
+        self.position = position;
+
+    }
+    
     fn num_axes(&self) -> usize
     {
 
@@ -77,7 +84,7 @@ impl crate::Shape for AABB
 
     }
 
-    fn get_axis(&self, index: usize, _target: (f64, f64)) -> (f64, f64)
+    fn get_axis(&self, index: usize, _target: (f32, f32)) -> (f32, f32)
     {
 
         return match index
@@ -90,7 +97,7 @@ impl crate::Shape for AABB
 
     }
 
-    fn project(&self, axis: (f64, f64), _normalize: bool) -> (f64, f64)
+    fn project(&self, axis: (f32, f32), _normalize: bool) -> (f32, f32)
     {
 
         return crate::project(self.position, axis, &self.points());
@@ -104,14 +111,14 @@ impl crate::Shape for AABB
 
     }
 
-    fn get_closest(&self, target: (f64, f64)) -> (f64, f64)
+    fn get_closest(&self, target: (f32, f32)) -> (f32, f32)
     {
 
         return crate::closest(self.position, target, &self.points());
 
     }
 
-    fn point(&self, _index: usize) -> (f64, f64)
+    fn point(&self, _index: usize) -> (f32, f32)
     {
 
         return self.position;

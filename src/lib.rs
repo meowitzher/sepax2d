@@ -11,7 +11,10 @@ pub trait Shape
 {
 
     /// The location of the shape in 2D space. 
-    fn position(&self) -> (f64, f64);
+    fn position(&self) -> (f32, f32);
+
+    /// Set the location of the shape.
+    fn set_position(&mut self, position: (f32, f32));
 
     /// The number of axes the shape provides for testing. For polygons, it is
     /// the same as the number of vertices, but for circles it is simply one. 
@@ -20,23 +23,23 @@ pub trait Shape
     /// The method used to access the axes during the SAT calculations. This is
     /// used to avoid the memory allocation of a new vector or array each time 
     /// we calculate collisions.
-    fn get_axis(&self, index: usize, target: (f64, f64)) -> (f64, f64);
+    fn get_axis(&self, index: usize, target: (f32, f32)) -> (f32, f32);
 
     /// Getting the minimum and maximum projection of the shape onto the given axis
     /// to look for overlap. Normalize denotes whether or not the axis passed in is
     /// a unit vector to avoid repeating calculations.
-    fn project(&self, axis: (f64, f64), normalize: bool) -> (f64, f64);
+    fn project(&self, axis: (f32, f32), normalize: bool) -> (f32, f32);
 
     /// Determine whether or not the shape needs access to the closest vertex of 
-    /// another shape to check collisions
+    /// another shape to check collisions.
     fn needs_closest(&self, index: usize) -> bool;
 
     /// Gets the closest vertex/primary point/position to the given target, NOT the closest point
     /// on the shape.
-    fn get_closest(&self, target: (f64, f64)) -> (f64, f64);
+    fn get_closest(&self, target: (f32, f32)) -> (f32, f32);
 
     /// The point corresponding to the given axis, if applicable. Otherwise, position.
-    fn point(&self, index: usize) -> (f64, f64);
+    fn point(&self, index: usize) -> (f32, f32);
 
 }
 
@@ -105,18 +108,18 @@ pub fn sat_overlap(left: &impl Shape, right: &impl Shape) -> bool
 /// let resolution = sat_collision(&square, &triangle);
 /// //resolution = (-0.5, 0.0) up to floating point error
 /// 
-/// assert!(resolution.0 + 0.5 < f64::EPSILON && resolution.0 + 0.5 > -f64::EPSILON);
-/// assert!(resolution.1 < f64::EPSILON && resolution.1 > -f64::EPSILON);
+/// assert!(resolution.0 + 0.5 < f32::EPSILON && resolution.0 + 0.5 > -f32::EPSILON);
+/// assert!(resolution.1 < f32::EPSILON && resolution.1 > -f32::EPSILON);
 /// 
 /// let aabb_resolution = sat_collision(&aabb, &triangle);
 /// //resolution = (-0.5, 0.0) up to floating point error. aabb is a different way to
 /// //represent the same shape as square
 /// 
-/// assert!(resolution.0 + 0.5 < f64::EPSILON && resolution.0 + 0.5 > -f64::EPSILON);
-/// assert!(resolution.1 < f64::EPSILON && resolution.1 > -f64::EPSILON);
+/// assert!(resolution.0 + 0.5 < f32::EPSILON && resolution.0 + 0.5 > -f32::EPSILON);
+/// assert!(resolution.1 < f32::EPSILON && resolution.1 > -f32::EPSILON);
 /// 
 /// ```
-pub fn sat_collision(left: &impl Shape, right: &impl Shape) -> (f64, f64)
+pub fn sat_collision(left: &impl Shape, right: &impl Shape) -> (f32, f32)
 {
 
     let l_overlap = shape_overlap(left, right, true);
@@ -131,10 +134,20 @@ pub fn sat_collision(left: &impl Shape, right: &impl Shape) -> (f64, f64)
 
 }
 
-fn shape_overlap(axes: &impl Shape, projected: &impl Shape, normalize: bool) -> (bool, f64, (f64, f64))
+
+pub fn contains_point(shape: &impl Shape, point: (f32, f32)) -> bool
 {
 
-    let mut min_overlap = f64::MAX;
+    let polygon = polygon::Polygon::from_vertices(point, vec![(0.0, 0.0)]);
+
+    return shape_overlap(shape, &polygon, false).0;
+
+}
+
+fn shape_overlap(axes: &impl Shape, projected: &impl Shape, normalize: bool) -> (bool, f32, (f32, f32))
+{
+
+    let mut min_overlap = f32::MAX;
     let mut min_axis = (0.0, 0.0);
 
     let num_axes = axes.num_axes();
@@ -149,9 +162,9 @@ fn shape_overlap(axes: &impl Shape, projected: &impl Shape, normalize: bool) -> 
         if normalize
         {
 
-            let length = f64::sqrt((axis.0 * axis.0) + (axis.1 * axis.1));
+            let length = f32::sqrt((axis.0 * axis.0) + (axis.1 * axis.1));
                     
-            if length > f64::EPSILON
+            if length > f32::EPSILON
             {
 
                 axis = (axis.0 / length, axis.1 / length);
@@ -164,14 +177,14 @@ fn shape_overlap(axes: &impl Shape, projected: &impl Shape, normalize: bool) -> 
         let (min_r, max_r) = projected.project(axis, normalize);
 
         //If there is no overlap, we can return early
-        if min_l > max_r - f64::EPSILON || min_r > max_l - f64::EPSILON
+        if min_l > max_r - f32::EPSILON || min_r > max_l - f32::EPSILON
         {
 
             return (false, 0.0, (0.0, 0.0)); 
 
         }
 
-        let overlap = f64::min(max_l, max_r) - f64::max(min_l, min_r);
+        let overlap = f32::min(max_l, max_r) - f32::max(min_l, min_r);
         if overlap < min_overlap
         {
 
@@ -186,7 +199,7 @@ fn shape_overlap(axes: &impl Shape, projected: &impl Shape, normalize: bool) -> 
     let axes_position = axes.position();
     let projected_position = projected.position();
     let difference = (projected_position.0 - axes_position.0, projected_position.1 - axes_position.1);
-    if (difference.0 * min_axis.0 + difference.1 * min_axis.1) < -f64::EPSILON
+    if (difference.0 * min_axis.0 + difference.1 * min_axis.1) < -f32::EPSILON
     {
 
         min_axis.0 *= -1.0;
@@ -198,11 +211,11 @@ fn shape_overlap(axes: &impl Shape, projected: &impl Shape, normalize: bool) -> 
 
 }
 
-fn project(position: (f64, f64), axis: (f64, f64), points: &[(f64, f64)]) -> (f64, f64)
+fn project(position: (f32, f32), axis: (f32, f32), points: &[(f32, f32)]) -> (f32, f32)
 {
 
-    let mut min = f64::MAX;
-    let mut max = f64::MIN;
+    let mut min = f32::MAX;
+    let mut max = f32::MIN;
 
     for (x, y) in points
     {
@@ -211,8 +224,8 @@ fn project(position: (f64, f64), axis: (f64, f64), points: &[(f64, f64)]) -> (f6
 
         let projection = (position.0 * axis.0) + (position.1 * axis.1);
 
-        min = f64::min(min, projection);
-        max = f64::max(max, projection);
+        min = f32::min(min, projection);
+        max = f32::max(max, projection);
 
     }
 
@@ -220,11 +233,11 @@ fn project(position: (f64, f64), axis: (f64, f64), points: &[(f64, f64)]) -> (f6
 
 }
 
-fn closest(position: (f64, f64), target: (f64, f64), points: &[(f64, f64)]) -> (f64, f64)
+fn closest(position: (f32, f32), target: (f32, f32), points: &[(f32, f32)]) -> (f32, f32)
 {
 
     let mut point = (0.0, 0.0);
-    let mut min = f64::MAX;
+    let mut min = f32::MAX;
 
     for (x, y) in points
     {
@@ -247,10 +260,10 @@ fn closest(position: (f64, f64), target: (f64, f64), points: &[(f64, f64)]) -> (
 }
 
 #[allow(dead_code)]
-fn float_equal(left: f64, right: f64) -> bool
+fn float_equal(left: f32, right: f32) -> bool
 {
 
-    return (left - right).abs() < f64::EPSILON;
+    return (left - right).abs() < f32::EPSILON;
 
 }
 
@@ -385,6 +398,28 @@ mod sat_tests
         assert!(float_equal(resolution1.1, 0.0));
         assert!(float_equal(resolution2.0, 0.0));
         assert!(float_equal(resolution2.1, 1.0));
+
+    }
+
+    #[test]
+    fn test_contains_point()
+    {
+
+        let capsule = Capsule::new((0.0, 0.0), (0.0, 2.0), 2.0);
+        let triangle = Polygon::from_vertices((0.0, 5.0), vec![(0.0, -2.0), (-1.0, 2.0), (1.0, 2.0)]);
+        let rectangle = AABB::new((-4.0, 4.0), 2.5, 0.5);
+        let circle = Circle::new((2.0, -2.5), 1.0);
+
+        assert!(contains_point(&capsule, (1.0, 1.0)));
+        assert!(contains_point(&triangle, (0.0, 5.0)));
+        assert!(contains_point(&rectangle, (-2.0, 4.1)));
+        assert!(contains_point(&circle, (2.5, -3.0)));
+
+
+        assert!(!contains_point(&capsule, (2.0, 4.0)));
+        assert!(!contains_point(&triangle, (0.0, 0.0)));
+        assert!(!contains_point(&rectangle, (-4.0, 3.9)));
+        assert!(!contains_point(&circle, (1.5, -3.5)));
 
     }
 
