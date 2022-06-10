@@ -3,9 +3,7 @@
 /// # Examples
 /// 
 /// ```
-/// use sepax2d::circle::Circle;
-/// use sepax2d::polygon::Polygon;
-/// use sepax2d::{sat_overlap, sat_collision};
+/// use sepax2d::prelude::*;
 /// 
 /// let circle1 = Circle::new((0.0, 0.0), 2.0);
 /// let circle2 = Circle::new((2.0, 2.0), 2.0);

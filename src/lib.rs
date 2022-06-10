@@ -54,8 +54,7 @@ pub trait Shape
 /// # Examples
 /// 
 /// ```
-/// use sepax2d::sat_overlap;
-/// use sepax2d::polygon::Polygon;
+/// use sepax2d::prelude::*;
 /// 
 /// let square = Polygon::from_vertices((1.0, 1.0), vec![(-1.0, 1.0), (1.0, 1.0), (1.0, -1.0), (-1.0, -1.0)]);
 /// let triangle = Polygon::from_vertices((0.0, 0.0), vec![(2.0, 2.0), (0.0, -2.0), (-1.0, 0.0)]);
@@ -96,9 +95,7 @@ pub fn sat_overlap(left: &impl Shape, right: &impl Shape) -> bool
 /// # Examples
 /// 
 /// ```
-/// use sepax2d::sat_collision;
-/// use sepax2d::polygon::Polygon;
-/// use sepax2d::aabb::AABB;
+/// use sepax2d::prelude::*;
 /// 
 /// let square = Polygon::from_vertices((1.0, 1.0), vec![(-1.0, 1.0), (1.0, 1.0), (1.0, -1.0), (-1.0, -1.0)]);
 /// let triangle = Polygon::from_vertices((-3.5, 1.0), vec![(4.0, 0.0), (0.0, 6.0), (-4.0, 0.0)]);
@@ -145,8 +142,7 @@ pub fn sat_collision(left: &impl Shape, right: &impl Shape) -> (f32, f32)
 /// # Examples
 /// 
 /// ```
-/// use sepax2d::contains_point;
-/// use sepax2d::polygon::Polygon;
+/// use sepax2d::prelude::*;
 /// 
 /// let square = Polygon::from_vertices((1.0, 1.0), vec![(-1.0, 1.0), (1.0, 1.0), (1.0, -1.0), (-1.0, -1.0)]);
 /// let triangle = Polygon::from_vertices((0.0, 0.0), vec![(2.0, 2.0), (0.0, -2.0), (-1.0, 0.0)]);
@@ -441,5 +437,17 @@ mod sat_tests
         assert!(!contains_point(&circle, (1.5, -3.5)));
 
     }
+
+}
+
+pub mod prelude
+{
+
+    pub use crate::{sat_overlap, sat_collision, contains_point};
+
+    pub use crate::polygon::Polygon;
+    pub use crate::circle::Circle;
+    pub use crate::aabb::AABB;
+    pub use crate::capsule::Capsule;
 
 }

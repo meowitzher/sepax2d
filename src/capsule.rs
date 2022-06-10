@@ -8,10 +8,7 @@ use crate::circle::Circle;
 /// # Examples
 /// 
 /// ```
-/// use sepax2d::capsule::Capsule;
-/// use sepax2d::polygon::Polygon;
-/// use sepax2d::aabb::AABB;
-/// use sepax2d::{sat_overlap, sat_collision};
+/// use sepax2d::prelude::*;
 /// 
 /// let capsule = Capsule::new((0.0, 0.0), (0.0, 1.0), 2.0);
 /// //A capsule formed from a rectangle with vertices (-1, 1), (1,1), (-1,-1), and (1,-1)

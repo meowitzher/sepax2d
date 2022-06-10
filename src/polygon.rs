@@ -13,7 +13,7 @@
 /// # Examples
 /// 
 /// ```
-/// use sepax2d::polygon::Polygon;
+/// use sepax2d::prelude::*;
 /// 
 /// let mut triangle = Polygon::new((3.0, 2.0));
 /// triangle.add((-1.0, -1.0));
@@ -51,7 +51,7 @@ impl Polygon
     /// # Examples
     /// 
     /// ```
-    /// use sepax2d::polygon::Polygon;
+    /// use sepax2d::prelude::*;
     /// 
     /// let point = Polygon::new((17.0, 5.0));
     /// ```
@@ -74,7 +74,7 @@ impl Polygon
     /// # Examples
     /// 
     /// ```
-    /// use sepax2d::polygon::Polygon;
+    /// use sepax2d::prelude::*;
     /// 
     /// let vertices = vec![(-1.0, 1.0), (1.0, 1.0), (1.0, -1.0), (-1.0, -1.0)];
     /// let square = Polygon::from_vertices((0.0, 0.0), vertices);
@@ -155,7 +155,7 @@ impl Polygon
     /// # Examples
     /// 
     /// ```
-    /// use sepax2d::polygon::Polygon;
+    /// use sepax2d::prelude::*;
     /// 
     /// let vertices = vec![(0.0, 0.0), (2.0, 0.0), (2.0, 2.0)];
     /// let mut polygon = Polygon::from_vertices((0.0, 0.0), vertices); //Triangle with vertices (0, 0), (2, 0), and (2, 2)
@@ -174,7 +174,7 @@ impl Polygon
     /// # Examples
     /// 
     /// ```
-    /// use sepax2d::polygon::Polygon;
+    /// use sepax2d::prelude::*;
     /// 
     /// let vertices = vec![(0.0, 0.0), (2.0, 0.0), (2.0, 1.0), (0.0, 1.0)];
     /// let rectangle = Polygon::from_vertices((0.0, 0.0), vertices); 
@@ -193,7 +193,7 @@ impl Polygon
     /// # Examples
     /// 
     /// ```
-    /// use sepax2d::polygon::Polygon;
+    /// use sepax2d::prelude::*;
     /// 
     /// let vertices = vec![(-1.0, 1.0), (1.0, 1.0), (1.0, -1.0), (-1.0, -1.0)];
     /// let square = Polygon::convex_from_vertices((0.0, 0.0), vertices);

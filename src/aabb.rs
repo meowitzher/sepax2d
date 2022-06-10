@@ -4,9 +4,7 @@
 /// # Examples
 /// 
 /// ```
-/// use sepax2d::aabb::AABB;
-/// use sepax2d::circle::Circle;
-/// use sepax2d::{sat_collision, sat_overlap};
+/// use sepax2d::prelude::*;
 /// 
 /// let box1 = AABB::new((0.0, 0.0), 10.0, 5.0);
 /// let box2 = AABB::new((-1.0, -0.5), 2.0, 1.0);
