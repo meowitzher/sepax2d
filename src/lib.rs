@@ -61,7 +61,7 @@ pub trait Shape
 /// 
 /// assert!(sat_overlap(&square, &triangle));
 /// ```
-pub fn sat_overlap(left: &impl Shape, right: &impl Shape) -> bool
+pub fn sat_overlap(left: &(impl Shape + ?Sized), right: &(impl Shape + ?Sized)) -> bool
 {
 
     if !shape_overlap(left, right, false).0
@@ -116,7 +116,7 @@ pub fn sat_overlap(left: &impl Shape, right: &impl Shape) -> bool
 /// assert!(resolution.1 < f32::EPSILON && resolution.1 > -f32::EPSILON);
 /// 
 /// ```
-pub fn sat_collision(left: &impl Shape, right: &impl Shape) -> (f32, f32)
+pub fn sat_collision(left: &(impl Shape + ?Sized), right: &(impl Shape + ?Sized)) -> (f32, f32)
 {
 
     let l_overlap = shape_overlap(left, right, true);
@@ -150,7 +150,7 @@ pub fn sat_collision(left: &impl Shape, right: &impl Shape) -> (f32, f32)
 /// assert!(contains_point(&triangle, (0.5, 0.5)));
 /// assert!(!contains_point(&square, (-2.0, 2.0)));
 /// ```
-pub fn contains_point(shape: &impl Shape, point: (f32, f32)) -> bool
+pub fn contains_point(shape: &(impl Shape + ?Sized), point: (f32, f32)) -> bool
 {
 
     let polygon = polygon::Polygon::from_vertices(point, vec![(0.0, 0.0)]);
@@ -159,7 +159,7 @@ pub fn contains_point(shape: &impl Shape, point: (f32, f32)) -> bool
 
 }
 
-fn shape_overlap(axes: &impl Shape, projected: &impl Shape, normalize: bool) -> (bool, f32, (f32, f32))
+fn shape_overlap(axes: &(impl Shape + ?Sized), projected: &(impl Shape + ?Sized), normalize: bool) -> (bool, f32, (f32, f32))
 {
 
     let mut min_overlap = f32::MAX;
