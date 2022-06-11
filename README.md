@@ -35,8 +35,6 @@ Use the `sat_overlap(&left, &right)` method to get a `bool` indicating whether o
 Any struct implementing the `Shape` trait can be used.
 
 ```rust
-use sepax2d::sat_overlap;
-
 assert!(sat_overlap(&circle, &capsule));
 assert!(sat_overlap(&triangle, &rectangle));
 ```
@@ -45,8 +43,6 @@ Use the `sat_collision(&left, &right)` method to get a `(f32, f32)` which repres
 position in order to resolve the overlap of the two shapes.
 
 ```rust
-use sepax2d::{sat_overlap, sat_collision};
-
 let resolution = sat_overlap(&circle, &triangle);
 
 let position = triangle.position();
@@ -59,8 +55,6 @@ Use the `contains_point(&shape, point)` method to get a `bool` indicating whethe
 is inside the given shape.
 
 ```rust
-use sepax2d::prelude::*;
-
 let rectangle = AABB::new((0.0, 0.0), 5.0, 2.0);
 
 assert!(contains_point(&rect, (1.0, 1.0)));
