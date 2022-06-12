@@ -19,6 +19,7 @@ use crate::circle::Circle;
 /// assert!(sat_overlap(&capsule, &hexagon));
 /// assert!(!sat_overlap(&square, &capsule));
 /// ```
+#[derive(Clone, Copy, Debug)]
 pub struct Capsule
 {
 

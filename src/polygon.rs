@@ -35,6 +35,7 @@
 /// 
 /// assert!(!concave_shape.is_convex());
 /// ```
+#[derive(Clone, Debug)]
 pub struct Polygon
 {
 

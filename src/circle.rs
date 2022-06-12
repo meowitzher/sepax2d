@@ -17,6 +17,7 @@
 /// assert!(sat_overlap(&polygon, &circle1));
 /// assert!(sat_overlap(&circle1, &polygon));
 /// ```
+#[derive(Clone, Copy, Debug)]
 pub struct Circle
 {
 

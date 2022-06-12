@@ -19,6 +19,7 @@
 /// assert!(resolution.0 - 2.0 < f32::EPSILON && resolution.0 - 2.0 > -f32::EPSILON);
 /// assert!(resolution.1 - 0.0 < f32::EPSILON && resolution.1 - 0.0 > -f32::EPSILON);
 /// ```
+#[derive(Clone, Copy, Debug)]
 pub struct AABB
 {
 
