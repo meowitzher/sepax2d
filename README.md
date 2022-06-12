@@ -1,3 +1,6 @@
+[![Crates.io](https://img.shields.io/crates/v/sepax2d.svg)](https://crates.io/crates/sepax2d)
+[![MIT/Apache 2.0](https://img.shields.io/badge/license-MIT%2FApache-blue.svg)](./LICENSE)
+
 # sepax2d
 A safe Rust crate for finding and resolving collisions of convex shapes using the Separating Axis Theorem (SAT) in two dimensions.
 
