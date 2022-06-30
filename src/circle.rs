@@ -1,3 +1,6 @@
+#[cfg(feature = "serde")]
+use serde::{Serialize, Deserialize};
+
 /// A struct representing a circle via a position and radius.
 /// 
 /// # Examples
@@ -18,6 +21,7 @@
 /// assert!(sat_overlap(&circle1, &polygon));
 /// ```
 #[derive(Clone, Copy, Debug)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Circle
 {
 

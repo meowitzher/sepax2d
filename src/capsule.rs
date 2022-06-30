@@ -1,3 +1,6 @@
+#[cfg(feature = "serde")]
+use serde::{Serialize, Deserialize};
+
 use crate::circle::Circle;
 
 /// A struct representing a capsule, i.e. a rotated rectangle capped by half circles.
@@ -20,6 +23,7 @@ use crate::circle::Circle;
 /// assert!(!sat_overlap(&square, &capsule));
 /// ```
 #[derive(Clone, Copy, Debug)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Capsule
 {
 

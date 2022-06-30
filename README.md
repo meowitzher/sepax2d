@@ -73,6 +73,10 @@ polygons, it is possible to define a concave shape. Polygon convexity can be tes
 `polygon.is_convex()` method. Alternatively, the `Polygon::convex_from_vertices(position, vertices)`
 constructor returns an `Option(Polygon)`, which is `None` if you try to make a concave polygon.
 
+### Features
+
+Enable the `serde` feature for (De)Serialization of supported shapes!
+
 ### Examples
 The repository includes two example applications built with [ggez](https://crates.io/crates/ggez)
 which show off the overlap and collision functionality. They can be run from the repo via:

@@ -1,3 +1,6 @@
+#[cfg(feature = "serde")]
+use serde::{Serialize, Deserialize};
+
 /// A polygon with a position and finitely many vertices given in either clockwise or
 /// counterclockwise orientation.
 /// 
@@ -36,6 +39,7 @@
 /// assert!(!concave_shape.is_convex());
 /// ```
 #[derive(Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Polygon
 {
 

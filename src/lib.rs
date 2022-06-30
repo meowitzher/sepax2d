@@ -16,6 +16,15 @@
 //! 
 //! ```rust
 //! use sepax2d::prelude::*;
+//! #
+//! # let top_left = (1.0, 1.0);
+//! # let width = 5.0;
+//! # let height = 5.0;
+//! # let center = (2.0, 0.0);
+//! # let radius = 2.0;
+//! # let arm = (1.0, 0.0);
+//! # let position = (-1.0, -1.0);
+//! 
 //! 
 //! let rectangle = AABB::new(top_left, width, height);
 //! let circle = Circle::new(center, radius);
@@ -38,15 +47,58 @@
 //! Any struct implementing the `Shape` trait can be used.
 //! 
 //! ```rust
+//! # use sepax2d::prelude::*;
+//! #
+//! # let top_left = (1.0, 1.0);
+//! # let width = 5.0;
+//! # let height = 5.0;
+//! # let center = (2.0, 0.0);
+//! # let radius = 2.0;
+//! # let arm = (1.0, 0.0);
+//! # let position = (-1.0, -1.0);
+//! # let rectangle = AABB::new(top_left, width, height);
+//! # let circle = Circle::new(center, radius);
+//! # let capsule = Capsule::new(center, arm, radius);
+//! #
+//! # let triangle = Polygon::from_vertices
+//! # (
+//! #    
+//! #    position,
+//! #    vec![(0.0, -2.0), (-1.0, 2.0), (1.0, 2.0)]
+//! #
+//! # );
+//! #
 //! assert!(sat_overlap(&circle, &capsule));
-//! assert!(sat_overlap(&triangle, &rectangle));
+//! assert!(!sat_overlap(&triangle, &rectangle));
 //! ```
 //! 
 //! Use the `sat_collision(&left, &right)` method to get a `(f32, f32)` which represents the shift needed to add to `right`'s
 //! position in order to resolve the overlap of the two shapes.
 //! 
 //! ```rust
-//! let resolution = sat_overlap(&circle, &triangle);
+//! # use sepax2d::prelude::*;
+//! #
+//! # let top_left = (1.0, 1.0);
+//! # let width = 5.0;
+//! # let height = 5.0;
+//! # let center = (2.0, 0.0);
+//! # let radius = 2.0;
+//! # let arm = (1.0, 0.0);
+//! # let position = (-1.0, -1.0);
+//! #
+//! # let rectangle = AABB::new(top_left, width, height);
+//! # let circle = Circle::new(center, radius);
+//! # let capsule = Capsule::new(center, arm, radius);
+//! #
+//! # let mut triangle = Polygon::from_vertices
+//! # (
+//! #    
+//! #    position,
+//! #    vec![(0.0, -2.0), (-1.0, 2.0), (1.0, 2.0)]
+//! #
+//! # );
+//! #
+//! let resolution = sat_collision(&circle, &triangle);
 //! 
 //! let position = triangle.position();
 //! triangle.set_position((position.0 + resolution.0, position.1 + resolution.1));
@@ -58,11 +110,17 @@
 //! is inside the given shape.
 //! 
 //! ```rust
-//! let rectangle = AABB::new((0.0, 0.0), 5.0, 2.0);
+//! # use sepax2d::prelude::*;
+//!
+//! let rect = AABB::new((0.0, 0.0), 5.0, 2.0);
 //! 
 //! assert!(contains_point(&rect, (1.0, 1.0)));
 //! assert!(!contains_point(&rect, (10.0, -1.0)));
 //! ```
+//! 
+//! ### Features
+//!
+//! Enable the `serde` feature for (De)Serialization of supported shapes!
 
 #![allow(clippy::needless_return)]
 
@@ -510,6 +568,8 @@ pub mod prelude
 {
 
     pub use crate::{sat_overlap, sat_collision, contains_point};
+
+    pub use crate::Shape;
 
     pub use crate::polygon::Polygon;
     pub use crate::circle::Circle;

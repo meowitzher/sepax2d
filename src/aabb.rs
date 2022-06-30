@@ -1,3 +1,6 @@
+#[cfg(feature = "serde")]
+use serde::{Serialize, Deserialize};
+
 /// An axis-aligned bounding box, that is a rectangle aligned
 /// along the Cartesian coordinate system.
 /// 
@@ -20,6 +23,7 @@
 /// assert!(resolution.1 - 0.0 < f32::EPSILON && resolution.1 - 0.0 > -f32::EPSILON);
 /// ```
 #[derive(Clone, Copy, Debug)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct AABB
 {
 
