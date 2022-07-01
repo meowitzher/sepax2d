@@ -1,5 +1,5 @@
 #[cfg(feature = "serde")]
-use serde::{Serialize, Deserialize, Deserializer};
+use serde::{Serialize, ser::SerializeStruct, Serializer, Deserialize, Deserializer};
 
 use crate::circle::Circle;
 
@@ -23,17 +23,42 @@ use crate::circle::Circle;
 /// assert!(!sat_overlap(&square, &capsule));
 /// ```
 #[derive(Clone, Copy, Debug)]
-#[cfg_attr(feature = "serde", derive(Serialize))]
 pub struct Capsule
 {
 
     pub position: (f32, f32),
     arm: (f32, f32),
-
-    #[cfg_attr(feature = "serde", serde(skip_serializing))]
     perp: (f32, f32),
-
     pub radius: f32
+
+}
+
+#[cfg(feature = "serde")]
+#[derive(Serialize, Deserialize)]
+#[serde(rename = "Capsule")]
+struct Cap
+{
+
+    position: (f32, f32),
+    arm: (f32, f32),
+    radius: f32
+
+}
+
+#[cfg(feature = "serde")]
+impl Serialize for Capsule
+{
+
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: Serializer
+    {
+
+        let mut state = serializer.serialize_struct("Capsule", 3)?;
+        state.serialize_field("position", &self.position)?;
+        state.serialize_field("arm", &self.arm)?;
+        state.serialize_field("radius", &self.radius)?;
+        state.end()
+
+    }
 
 }
 
@@ -44,8 +69,8 @@ impl <'de> Deserialize<'de> for Capsule
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error> where D: Deserializer<'de>
     {
 
-        let raw = <((f32, f32), (f32, f32), f32)>::deserialize(deserializer)?;
-        return Ok(Capsule::new(raw.0, raw.1, raw.2));
+        let raw = <Cap>::deserialize(deserializer)?;
+        return Ok(Capsule::new(raw.position, raw.arm, raw.radius));
 
     }
 
@@ -306,6 +331,22 @@ mod capsule_tests
         assert!(!capsule.needs_closest(1));
         assert!(capsule.needs_closest(2));
         assert!(capsule.needs_closest(3));
+
+    }
+
+    #[cfg(feature = "serde")]
+    #[test]
+    fn test_serde()
+    {
+
+        let capsule: Capsule = ron::from_str("Capsule(position: (0.0, 0.0), arm: (10.0, 0.0), radius: 5.0)").unwrap();
+
+        assert!(float_equal(capsule.perp.0, 0.0));
+        assert!(float_equal(capsule.perp.1, 5.0));
+
+        let de = ron::to_string(&capsule).unwrap();
+
+        assert_eq!(de, "(position:(0.0,0.0),arm:(10.0,0.0),radius:5.0)");
 
     }
 

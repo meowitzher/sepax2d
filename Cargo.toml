@@ -2,7 +2,7 @@
 name = "sepax2d"
 license = "MIT OR Apache-2.0"
 description = "A safe crate for finding and resolving collisions of 2D convex shapes using the Separating Axis Theorem."
-version = "0.3.6"
+version = "0.3.7"
 edition = "2021"
 repository = "https://github.com/meowitzher/sepax2d/"
 
@@ -14,6 +14,7 @@ serde = { version = "1.0", features = ["derive"], optional = true }
 
 [dev-dependencies]
 ggez = "0.7"
+ron = "0.7"
 
 [[example]]
 name = "dynamic"
