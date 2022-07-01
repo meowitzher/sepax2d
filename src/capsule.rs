@@ -1,5 +1,5 @@
 #[cfg(feature = "serde")]
-use serde::{Serialize, Deserialize};
+use serde::{Serialize, Deserialize, Deserializer};
 
 use crate::circle::Circle;
 
@@ -23,14 +23,31 @@ use crate::circle::Circle;
 /// assert!(!sat_overlap(&square, &capsule));
 /// ```
 #[derive(Clone, Copy, Debug)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize))]
 pub struct Capsule
 {
 
     pub position: (f32, f32),
     arm: (f32, f32),
+
+    #[cfg_attr(feature = "serde", serde(skip_serializing))]
     perp: (f32, f32),
+
     pub radius: f32
+
+}
+
+#[cfg(feature = "serde")]
+impl <'de> Deserialize<'de> for Capsule
+{
+
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error> where D: Deserializer<'de>
+    {
+
+        let raw = <((f32, f32), (f32, f32), f32)>::deserialize(deserializer)?;
+        return Ok(Capsule::new(raw.0, raw.1, raw.2));
+
+    }
 
 }
 

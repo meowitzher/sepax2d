@@ -31,7 +31,6 @@ pub struct AABB
     pub width: f32,
     pub height: f32
     
-
 }
 
 impl AABB
