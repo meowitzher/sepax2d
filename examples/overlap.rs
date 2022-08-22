@@ -1,11 +1,7 @@
 use ggez::{event, graphics};
 use ggez::{Context, ContextBuilder, GameResult};
 
-use sepax2d::{Shape, sat_overlap, contains_point};
-use sepax2d::polygon::Polygon;
-use sepax2d::circle::Circle;
-use sepax2d::aabb::AABB;
-use sepax2d::capsule::Capsule;
+use sepax2d::prelude::*;
 
 mod dynamic;
 use dynamic::DrawableShape;
@@ -29,7 +25,7 @@ impl MainState
         let hexagon = Polygon::from_vertices((600.0, 100.0), vec![(0.0, 0.0), (50.0, 50.0), (50.0, 100.0), (0.0, 150.0), (-50.0, 100.0), (-50.0, 50.0)]);
         let triangle = Polygon::from_vertices((150.0, 150.0), vec![(0.0, 0.0), (100.0, 50.0), (0.0, 50.0)]);
     
-        let circle = Circle::new((400.0, 200.0), 80.0);
+        let circle = Circle::new((300.0, 100.0), 80.0);
         let small_circle = Circle::new((700.0, 300.0), 40.0);
     
         let rectangle = AABB::new((550.0, 400.0), 100.0, 50.0);
@@ -37,6 +33,8 @@ impl MainState
     
         let vertical_capsule = Capsule::new((250.0, 400.0), (0.0, 30.0), 40.0);
         let rotated_capsule = Capsule::new((400.0, 500.0), (30.0, 20.0), 50.0);
+
+        let gram = Parallelogram::new((400.0, 300.0), (25.0, 50.0), (25.0, -100.0));
 
         let s = MainState { shapes: vec!
         [
@@ -48,7 +46,8 @@ impl MainState
             (Box::new(rectangle), false),
             (Box::new(square), false),
             (Box::new(vertical_capsule), false),
-            (Box::new(rotated_capsule), false)
+            (Box::new(rotated_capsule), false),
+            (Box::new(gram), false)
 
         ], mouse: (0.0, 0.0), selected: None };
 

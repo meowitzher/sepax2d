@@ -33,49 +33,6 @@ pub struct Capsule
 
 }
 
-#[cfg(feature = "serde")]
-#[derive(Serialize, Deserialize)]
-#[serde(rename = "Capsule")]
-struct Cap
-{
-
-    position: (f32, f32),
-    arm: (f32, f32),
-    radius: f32
-
-}
-
-#[cfg(feature = "serde")]
-impl Serialize for Capsule
-{
-
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: Serializer
-    {
-
-        let mut state = serializer.serialize_struct("Capsule", 3)?;
-        state.serialize_field("position", &self.position)?;
-        state.serialize_field("arm", &self.arm)?;
-        state.serialize_field("radius", &self.radius)?;
-        state.end()
-
-    }
-
-}
-
-#[cfg(feature = "serde")]
-impl <'de> Deserialize<'de> for Capsule
-{
-
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error> where D: Deserializer<'de>
-    {
-
-        let raw = <Cap>::deserialize(deserializer)?;
-        return Ok(Capsule::new(raw.position, raw.arm, raw.radius));
-
-    }
-
-}
-
 impl Capsule
 {
 
@@ -258,6 +215,50 @@ impl crate::Shape for Capsule
             _ => (self.position.0 - self.arm.0, self.position.1 - self.arm.1)
             
         };
+
+    }
+
+}
+
+
+#[cfg(feature = "serde")]
+#[derive(Serialize, Deserialize)]
+#[serde(rename = "Capsule")]
+struct Cap
+{
+
+    position: (f32, f32),
+    arm: (f32, f32),
+    radius: f32
+
+}
+
+#[cfg(feature = "serde")]
+impl Serialize for Capsule
+{
+
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: Serializer
+    {
+
+        let mut state = serializer.serialize_struct("Capsule", 3)?;
+        state.serialize_field("position", &self.position)?;
+        state.serialize_field("arm", &self.arm)?;
+        state.serialize_field("radius", &self.radius)?;
+        state.end()
+
+    }
+
+}
+
+#[cfg(feature = "serde")]
+impl <'de> Deserialize<'de> for Capsule
+{
+
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error> where D: Deserializer<'de>
+    {
+
+        let raw = <Cap>::deserialize(deserializer)?;
+        return Ok(Capsule::new(raw.position, raw.arm, raw.radius));
 
     }
 

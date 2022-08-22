@@ -24,11 +24,13 @@
 //! # let radius = 2.0;
 //! # let arm = (1.0, 0.0);
 //! # let position = (-1.0, -1.0);
-//! 
+//! # let u_vector = (2.0, 1.0);
+//! # let v_vector = (0.0, -2.0);
 //! 
 //! let rectangle = AABB::new(top_left, width, height);
 //! let circle = Circle::new(center, radius);
 //! let capsule = Capsule::new(center, arm, radius);
+//! let parallelogram = Parallelogram::new(position, u_vector, v_vector);
 //! 
 //! //The vertices of a polygon are position vectors
 //! //relative to the shape's position, i.e. if position 
@@ -128,6 +130,7 @@ pub mod polygon;
 pub mod circle;
 pub mod aabb;
 pub mod capsule;
+pub mod parallelogram;
 
 /// A trait describing the behavior needed to implement SAT overlap and collision
 /// for a given shape.
@@ -168,7 +171,7 @@ pub trait Shape
 }
 
 /// Returns true if the given shapes overlap, and false if they do not. Does not work for
-/// degenerate polygons.
+/// degenerate shapes.
 /// 
 /// This method performs a floating point comparison with Rust's built in epsilon constant, so it may
 /// return the incorrect answer for shapes which are very small or very close together.
@@ -207,7 +210,7 @@ pub fn sat_overlap(left: &(impl Shape + ?Sized), right: &(impl Shape + ?Sized)) 
 }
 
 /// Returns the vector that needs to be added to the second shape's position to resolve a collision with 
-/// the first shape. Does not work for degenerate polygons.
+/// the first shape. Does not work for degenerate shapes.
 /// 
 /// If the shapes are not colliding, it returns the zero vector.
 /// 
@@ -323,7 +326,7 @@ fn shape_overlap(axes: &(impl Shape + ?Sized), projected: &(impl Shape + ?Sized)
 
         }
 
-        let overlap = f32::min(max_l, max_r) - f32::max(min_l, min_r);
+        let overlap = f32::min(max_l - min_r, max_r - min_l);
         if overlap < min_overlap
         {
 
@@ -411,10 +414,7 @@ mod sat_tests
 {
 
     use super::*;
-    use super::polygon::Polygon;
-    use super::circle::Circle;
-    use super::aabb::AABB;
-    use super::capsule::Capsule;
+    use super::prelude::*;
 
     #[test]
     fn test_sat_overlap()
@@ -541,6 +541,29 @@ mod sat_tests
     }
 
     #[test]
+    fn test_parallelogram_collision()
+    {
+
+        let gram = Parallelogram::new((0.0, -0.5), (2.0, 1.0), (-1.0, -1.0));
+
+        let triangle = Polygon::from_vertices((0.0, 5.0), vec![(0.0, -2.0), (-1.0, 2.0), (1.0, 2.0)]);
+        let rectangle = AABB::new((-1.0, 0.0), 4.0, 2.0);
+        let circle = Circle::new((2.0, -2.5), 1.0);
+
+        assert!(!sat_overlap(&gram, &triangle));
+        assert!(!sat_overlap(&gram, &circle));
+
+        assert!(sat_overlap(&gram, &rectangle));
+
+        let resolution = sat_collision(&rectangle, &gram);
+        println!("{:?}", resolution);
+        
+        assert!(float_equal(resolution.0, 0.0));
+        assert!(float_equal(resolution.1, -0.5));
+
+    }
+
+    #[test]
     fn test_contains_point()
     {
 
@@ -575,5 +598,6 @@ pub mod prelude
     pub use crate::circle::Circle;
     pub use crate::aabb::AABB;
     pub use crate::capsule::Capsule;
+    pub use crate::parallelogram::Parallelogram;
 
 }

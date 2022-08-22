@@ -1,11 +1,7 @@
 use ggez::graphics::{Color, DrawMode, Mesh, MeshBuilder};
 use ggez::{Context, GameResult};
 
-use sepax2d::Shape;
-use sepax2d::polygon::Polygon;
-use sepax2d::circle::Circle;
-use sepax2d::aabb::AABB;
-use sepax2d::capsule::Capsule;
+use sepax2d::prelude::*;
 
 pub trait DrawableShape: Shape
 {
@@ -98,6 +94,36 @@ impl DrawableShape for Polygon
         //find out how.
         let mut points = Vec::<[f32; 2]>::new();
         for (x, y) in self.vertices.iter()
+        {
+
+            points.push([*x, *y]);
+
+        }
+
+        let mesh = Mesh::new_polygon
+        (
+
+            context,
+            DrawMode::fill(),
+            &points,
+            if collides { Color::BLUE } else { Color::WHITE }
+
+        );
+
+        return mesh;
+
+    }
+
+}
+
+impl DrawableShape for Parallelogram
+{
+
+    fn draw(&self, collides: bool, context: &mut Context) -> GameResult<Mesh>
+    {
+
+        let mut points = Vec::<[f32; 2]>::new();
+        for (x, y) in self.points().iter()
         {
 
             points.push([*x, *y]);
