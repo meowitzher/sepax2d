@@ -326,6 +326,33 @@ impl crate::Shape for Polygon
 
 }
 
+impl crate::Rotate for Polygon
+{
+
+    fn rotate(&mut self, angle: f32)
+    {
+
+        let sin = f32::sin(angle);
+        let cos = f32::cos(angle);
+
+        self.rotate_sincos(sin, cos);
+
+    }
+
+    fn rotate_sincos(&mut self, sin: f32, cos: f32)
+    {
+
+        for v in self.vertices.iter_mut()
+        {
+
+            *v = crate::rotate!(sin, cos, v);
+
+        }
+
+    }
+
+}
+
 #[cfg(test)]
 mod polygon_tests
 {

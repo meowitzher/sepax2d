@@ -28,3 +28,7 @@ path = "examples/overlap.rs"
 [[example]]
 name = "collision"
 path = "examples/collision.rs"
+
+[[example]]
+name = "rotation"
+path = "examples/rotation.rs"

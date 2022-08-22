@@ -170,6 +170,35 @@ pub trait Shape
 
 }
 
+/// A trait indicating that a shape can be rotated around its position. Applicable
+/// to all shapes other than AABB.
+pub trait Rotate
+{
+
+    /// Rotate the shape by the given angle, with the rotation counterclockwise when
+    /// the Y-axis points up.
+    fn rotate(&mut self, angle: f32);
+
+    /// Rotate the shape using the given sine and cosine of an angle. Use this when
+    /// you are rotating multiple shapes by the same angle and don't want to re-calculate
+    /// the trig functions.
+    fn rotate_sincos(&mut self, sin: f32, cos: f32);
+
+}
+
+#[macro_export]
+macro_rules! rotate
+{
+
+    ($s: expr, $c: expr, $v: expr) =>
+    {
+
+        ($c * $v.0 - $s * $v.1, $s * $v.0 + $c * $v.1   )
+
+    };
+
+}
+
 /// Returns true if the given shapes overlap, and false if they do not. Does not work for
 /// degenerate shapes.
 /// 
@@ -405,7 +434,7 @@ fn closest(position: (f32, f32), target: (f32, f32), points: &[(f32, f32)]) -> (
 fn float_equal(left: f32, right: f32) -> bool
 {
 
-    return (left - right).abs() < f32::EPSILON;
+    return (left - right).abs() < 0.00001;
 
 }
 
@@ -585,6 +614,40 @@ mod sat_tests
 
     }
 
+    #[test]
+    fn test_rotate()
+    {
+
+        let mut triangle = Polygon::from_vertices((0.0, 0.0), vec![(0.0, 0.0), (2.0, 0.0), (0.0, 1.0)]);
+        let mut capsule = Capsule::new((2.0, 1.0), (2.0, 0.0), 4.0);
+        let mut gram = Parallelogram::new((3.0, 4.0), (2.0, 1.0), (-1.0, 1.0));
+
+        capsule.rotate(std::f32::consts::FRAC_PI_4);
+
+        assert!(float_equal(capsule.arm().0, 2.0 / f32::sqrt(2.0)));
+        assert!(float_equal(capsule.arm().1, 2.0 / f32::sqrt(2.0)));
+        assert!(float_equal(capsule.perp().0, -4.0 / f32::sqrt(2.0)));
+        assert!(float_equal(capsule.perp().1, 4.0 / f32::sqrt(2.0)));
+
+        let sin = f32::sin(std::f32::consts::PI);
+        let cos = f32::cos(std::f32::consts::PI);
+
+        triangle.rotate_sincos(sin, cos);
+
+        assert!(float_equal(triangle.vertices[1].0, -2.0));
+        assert!(float_equal(triangle.vertices[1].1, 0.0));
+        assert!(float_equal(triangle.vertices[2].0, 0.0));
+        assert!(float_equal(triangle.vertices[2].1, -1.0));
+
+        gram.rotate_sincos(sin, cos);
+
+        assert!(float_equal(gram.u.0, -2.0));
+        assert!(float_equal(gram.u.1, -1.0));
+        assert!(float_equal(gram.v.0, 1.0));
+        assert!(float_equal(gram.v.1, -1.0));
+
+    }
+
 }
 
 pub mod prelude
@@ -593,6 +656,7 @@ pub mod prelude
     pub use crate::{sat_overlap, sat_collision, contains_point};
 
     pub use crate::Shape;
+    pub use crate::Rotate;
 
     pub use crate::polygon::Polygon;
     pub use crate::circle::Circle;

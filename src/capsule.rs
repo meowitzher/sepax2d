@@ -220,6 +220,28 @@ impl crate::Shape for Capsule
 
 }
 
+impl crate::Rotate for Capsule
+{
+
+    fn rotate(&mut self, angle: f32)
+    {
+
+        let sin = f32::sin(angle);
+        let cos = f32::cos(angle);
+
+        self.rotate_sincos(sin, cos);
+
+    }
+
+    fn rotate_sincos(&mut self, sin: f32, cos: f32)
+    {
+
+        let arm = crate::rotate!(sin, cos, self.arm);
+        self.set_arm(arm);
+
+    }
+
+}
 
 #[cfg(feature = "serde")]
 #[derive(Serialize, Deserialize)]

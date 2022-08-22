@@ -127,6 +127,29 @@ impl crate::Shape for Parallelogram
 
 }
 
+impl crate::Rotate for Parallelogram
+{
+
+    fn rotate(&mut self, angle: f32)
+    {
+
+        let sin = f32::sin(angle);
+        let cos = f32::cos(angle);
+
+        self.rotate_sincos(sin, cos);
+
+    }
+
+    fn rotate_sincos(&mut self, sin: f32, cos: f32)
+    {
+
+        self.u = crate::rotate!(sin, cos, self.u);
+        self.v = crate::rotate!(sin, cos, self.v);
+
+    }
+
+}
+
 #[cfg(test)]
 mod paralellogram_tests
 {

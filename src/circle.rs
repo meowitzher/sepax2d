@@ -117,6 +117,21 @@ impl crate::Shape for Circle
 
 }
 
+impl crate::Rotate for Circle
+{
+
+    fn rotate(&mut self, _angle: f32)
+    {
+
+    }
+
+    fn rotate_sincos(&mut self, _sin: f32, _cos: f32)
+    {
+
+    }
+
+}
+
 #[cfg(test)]
 mod circle_tests
 {
