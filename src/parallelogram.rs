@@ -42,6 +42,14 @@ impl Parallelogram
 
     }
 
+    /// Creates a rectangular parallelogram so that it can be rotated later.
+    pub fn rectangle(position: (f32, f32), width: f32, height: f32) -> Parallelogram
+    {
+
+        return Parallelogram { position, u: (width, 0.0), v: (0.0, height) };
+
+    }
+
     pub fn points(&self) -> [(f32, f32); 4]
     {
 
