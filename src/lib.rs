@@ -120,6 +120,24 @@
 //! assert!(!contains_point(&rect, (10.0, -1.0)));
 //! ```
 //! 
+//! `Polygon`, `Circle`, `Capsule`, and `Parallelogram` shapes implement the `Rotate` trait, which allows you to rotate them
+//! around their `position`.
+//! 
+//! ```rust
+//! # use sepax2d::prelude::*;
+//! # let position = (-1.0, -1.0);
+//! 
+//! let mut triangle = Polygon::from_vertices
+//! (
+//!    
+//!    position,
+//!    vec![(-1.0, 0.0), (0.0, 2.0), (1.0, 0.0)]
+//!
+//! );
+//! 
+//! triangle.rotate(std::f32::consts::FRAC_PI_2)
+//! //New vertices: [(0.0, -1.0), (-2.0, 0.0), (0.0, 1.0)]
+//! ```
 //! ### Features
 //!
 //! Enable the `serde` feature for (De)Serialization of supported shapes!
