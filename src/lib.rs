@@ -150,6 +150,8 @@ pub mod aabb;
 pub mod capsule;
 pub mod parallelogram;
 
+pub mod line;
+
 /// A trait describing the behavior needed to implement SAT overlap and collision
 /// for a given shape.
 pub trait Shape
@@ -204,6 +206,7 @@ pub trait Rotate
 
 }
 
+//Helper macro to rotate the given 2D vector v by the rotation matrix with sine s and cosine c
 #[macro_export]
 macro_rules! rotate
 {
@@ -681,5 +684,7 @@ pub mod prelude
     pub use crate::aabb::AABB;
     pub use crate::capsule::Capsule;
     pub use crate::parallelogram::Parallelogram;
+
+    pub use crate::line::intersects_line;
 
 }
