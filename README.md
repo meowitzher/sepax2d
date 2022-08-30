@@ -108,13 +108,15 @@ constructor returns an `Option(Polygon)`, which is `None` if you try to make a c
 Enable the `serde` feature for (De)Serialization of supported shapes!
 
 ### Examples
-The repository includes two example applications built with [ggez](https://crates.io/crates/ggez)
+The repository includes three example applications built with [ggez](https://crates.io/crates/ggez)
 which show off the overlap and collision functionality. They can be run from the repo via:
 
 ```sh
 cargo run --example overlap
 
 cargo run --example collision
+
+cargo run --example rotation
 ```
 
 ### Contribution
