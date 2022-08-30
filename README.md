@@ -22,8 +22,8 @@ let circle = Circle::new(center, radius);
 let capsule = Capsule::new(center, arm, radius);
 
 //The vertices of a polygon are position vectors
-//relative to the shape's position, i.e. if position 
-//is (1, 2), then the absolute location of the 
+//relative to the shape's position, i.e. if position
+//is (1, 2), then the absolute location of the
 //first vertex is (1, 0).
 let triangle = Polygon::from_vertices
 (
@@ -64,12 +64,42 @@ assert!(contains_point(&rect, (1.0, 1.0)));
 assert!(!contains_point(&rect, (10.0, -1.0)));
 ```
 
+`Polygon`, `Circle`, `Capsule`, and `Parallelogram` shapes implement the `Rotate` trait, which allows you to rotate them
+around their `position`.
+
+```rust
+# use sepax2d::prelude::*;
+# let position = (-1.0, -1.0);
+
+let mut triangle = Polygon::from_vertices
+(
+
+    position,
+    vec![(-1.0, 0.0), (0.0, 2.0), (1.0, 0.0)]
+
+);
+
+triangle.rotate(std::f32::consts::FRAC_PI_2)
+//New vertices: [(0.0, -1.0), (-2.0, 0.0), (0.0, 1.0)]
+```
+
+You can use the `intersects_line`, `intersects_ray`, and `intersects_segment` methods to
+check whether a shape intersects with the corresponding type of line.
+
+```rust
+# use sepax2d::prelude::*;
+
+let triangle = Polygon::from_vertices((0.0, vec![(0.0, 0.0), (1.0, 1.0), (-1.0, 1.0)]));
+
+assert!(intersects_segment(&triangle, (2.0, 0.5), (-2.0, 0.5)));
+```
+
 ### Considerations
 The Separating Axis Theorem only holds for convex shapes. If a concave shape is passed in, it is possible
 for overlap to be missed and false overlap to be detected.
 
-Convexity is not a problem for `Circle`, `AABB`, or `Capsule` as those are convex by definition. For 
-polygons, it is possible to define a concave shape. Polygon convexity can be tested using the 
+Convexity is not a problem for `Circle`, `AABB`, `Parallelogram`, or `Capsule` as those are convex by definition. For
+polygons, it is possible to define a concave shape. Polygon convexity can be tested using the
 `polygon.is_convex()` method. Alternatively, the `Polygon::convex_from_vertices(position, vertices)`
 constructor returns an `Option(Polygon)`, which is `None` if you try to make a concave polygon.
 

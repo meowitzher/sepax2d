@@ -1,19 +1,19 @@
 //! [![Crates.io](https://img.shields.io/crates/v/sepax2d.svg)](https://crates.io/crates/sepax2d)
 //! [![MIT/Apache 2.0](https://img.shields.io/badge/license-MIT%2FApache-blue.svg)](./LICENSE)
-//! 
+//!
 //! # sepax2d
 //! A safe Rust crate for finding and resolving collisions of convex shapes using the Separating Axis Theorem (SAT) in two dimensions.
-//! 
+//!
 //! ### Usage
-//! 
+//!
 //! Add the following to the `[dependencies]` section of your `Cargo.toml`:
-//! 
+//!
 //! ```toml
 //! sepax2d = "0.3"
 //! ```
-//! 
+//!
 //! Import the types of shapes you'd like to use and create some new shapes:
-//! 
+//!
 //! ```rust
 //! use sepax2d::prelude::*;
 //! #
@@ -26,28 +26,28 @@
 //! # let position = (-1.0, -1.0);
 //! # let u_vector = (2.0, 1.0);
 //! # let v_vector = (0.0, -2.0);
-//! 
+//!
 //! let rectangle = AABB::new(top_left, width, height);
 //! let circle = Circle::new(center, radius);
 //! let capsule = Capsule::new(center, arm, radius);
 //! let parallelogram = Parallelogram::new(position, u_vector, v_vector);
-//! 
+//!
 //! //The vertices of a polygon are position vectors
-//! //relative to the shape's position, i.e. if position 
-//! //is (1, 2), then the absolute location of the 
+//! //relative to the shape's position, i.e. if position
+//! //is (1, 2), then the absolute location of the
 //! //first vertex is (1, 0).
 //! let triangle = Polygon::from_vertices
 //! (
-//!     
+//!
 //!     position,
 //!     vec![(0.0, -2.0), (-1.0, 2.0), (1.0, 2.0)]
-//! 
+//!
 //! );
 //! ```
-//! 
+//!
 //! Use the `sat_overlap(&left, &right)` method to get a `bool` indicating whether or not the two given shapes overlap.
 //! Any struct implementing the `Shape` trait can be used.
-//! 
+//!
 //! ```rust
 //! # use sepax2d::prelude::*;
 //! #
@@ -64,7 +64,7 @@
 //! #
 //! # let triangle = Polygon::from_vertices
 //! # (
-//! #    
+//! #
 //! #    position,
 //! #    vec![(0.0, -2.0), (-1.0, 2.0), (1.0, 2.0)]
 //! #
@@ -73,10 +73,10 @@
 //! assert!(sat_overlap(&circle, &capsule));
 //! assert!(!sat_overlap(&triangle, &rectangle));
 //! ```
-//! 
+//!
 //! Use the `sat_collision(&left, &right)` method to get a `(f32, f32)` which represents the shift needed to add to `right`'s
 //! position in order to resolve the overlap of the two shapes.
-//! 
+//!
 //! ```rust
 //! # use sepax2d::prelude::*;
 //! #
@@ -94,50 +94,62 @@
 //! #
 //! # let mut triangle = Polygon::from_vertices
 //! # (
-//! #    
+//! #
 //! #    position,
 //! #    vec![(0.0, -2.0), (-1.0, 2.0), (1.0, 2.0)]
 //! #
 //! # );
 //! #
 //! let resolution = sat_collision(&circle, &triangle);
-//! 
+//!
 //! let position = triangle.position();
 //! triangle.set_position((position.0 + resolution.0, position.1 + resolution.1));
-//! 
+//!
 //! assert!(!sat_overlap(&circle, &triangle));
 //! ```
-//! 
+//!
 //! Use the `contains_point(&shape, point)` method to get a `bool` indicating whether or not the specified point
 //! is inside the given shape.
-//! 
+//!
 //! ```rust
 //! # use sepax2d::prelude::*;
 //!
 //! let rect = AABB::new((0.0, 0.0), 5.0, 2.0);
-//! 
+//!
 //! assert!(contains_point(&rect, (1.0, 1.0)));
 //! assert!(!contains_point(&rect, (10.0, -1.0)));
 //! ```
-//! 
+//!
 //! `Polygon`, `Circle`, `Capsule`, and `Parallelogram` shapes implement the `Rotate` trait, which allows you to rotate them
 //! around their `position`.
-//! 
+//!
 //! ```rust
 //! # use sepax2d::prelude::*;
 //! # let position = (-1.0, -1.0);
-//! 
+//!
 //! let mut triangle = Polygon::from_vertices
 //! (
-//!    
+//!
 //!    position,
 //!    vec![(-1.0, 0.0), (0.0, 2.0), (1.0, 0.0)]
 //!
 //! );
-//! 
+//!
 //! triangle.rotate(std::f32::consts::FRAC_PI_2)
 //! //New vertices: [(0.0, -1.0), (-2.0, 0.0), (0.0, 1.0)]
 //! ```
+//!
+//! You can use the `intersects_line`, `intersects_ray`, and `intersects_segment` methods to
+//! check whether a shape intersects with the corresponding type of line.
+//!
+//! ```rust
+//! # use sepax2d::prelude::*;
+//!
+//! let triangle = Polygon::from_vertices((0.0, vec![(0.0, 0.0), (1.0, 1.0), (-1.0, 1.0)]));
+//!
+//! assert!(intersects_segment(&triangle, (2.0, 0.5), (-2.0, 0.5)));
+//! ```
+//!
 //! ### Features
 //!
 //! Enable the `serde` feature for (De)Serialization of supported shapes!
@@ -157,18 +169,18 @@ pub mod line;
 pub trait Shape
 {
 
-    /// The location of the shape in 2D space. 
+    /// The location of the shape in 2D space.
     fn position(&self) -> (f32, f32);
 
     /// Set the location of the shape.
     fn set_position(&mut self, position: (f32, f32));
 
     /// The number of axes the shape provides for testing. For polygons, it is
-    /// the same as the number of vertices, but for circles it is simply one. 
+    /// the same as the number of vertices, but for circles it is simply one.
     fn num_axes(&self) -> usize;
 
     /// The method used to access the axes during the SAT calculations. This is
-    /// used to avoid the memory allocation of a new vector or array each time 
+    /// used to avoid the memory allocation of a new vector or array each time
     /// we calculate collisions.
     fn get_axis(&self, index: usize, target: (f32, f32)) -> (f32, f32);
 
@@ -177,7 +189,7 @@ pub trait Shape
     /// a unit vector to avoid repeating calculations.
     fn project(&self, axis: (f32, f32), normalize: bool) -> (f32, f32);
 
-    /// Determine whether or not the shape needs access to the closest vertex of 
+    /// Determine whether or not the shape needs access to the closest vertex of
     /// another shape to check collisions.
     fn needs_closest(&self, index: usize) -> bool;
 
@@ -222,20 +234,20 @@ macro_rules! rotate
 
 /// Returns true if the given shapes overlap, and false if they do not. Does not work for
 /// degenerate shapes.
-/// 
+///
 /// This method performs a floating point comparison with Rust's built in epsilon constant, so it may
 /// return the incorrect answer for shapes which are very small or very close together.
-/// 
+///
 /// Requires both shapes to be convex.
-/// 
+///
 /// # Examples
-/// 
+///
 /// ```
 /// use sepax2d::prelude::*;
-/// 
+///
 /// let square = Polygon::from_vertices((1.0, 1.0), vec![(-1.0, 1.0), (1.0, 1.0), (1.0, -1.0), (-1.0, -1.0)]);
 /// let triangle = Polygon::from_vertices((0.0, 0.0), vec![(2.0, 2.0), (0.0, -2.0), (-1.0, 0.0)]);
-/// 
+///
 /// assert!(sat_overlap(&square, &triangle));
 /// ```
 pub fn sat_overlap(left: &(impl Shape + ?Sized), right: &(impl Shape + ?Sized)) -> bool
@@ -259,39 +271,39 @@ pub fn sat_overlap(left: &(impl Shape + ?Sized), right: &(impl Shape + ?Sized)) 
 
 }
 
-/// Returns the vector that needs to be added to the second shape's position to resolve a collision with 
+/// Returns the vector that needs to be added to the second shape's position to resolve a collision with
 /// the first shape. Does not work for degenerate shapes.
-/// 
+///
 /// If the shapes are not colliding, it returns the zero vector.
-/// 
+///
 /// This method performs a floating point comparison with Rust's built in epsilon constant, so it may
 /// return the incorrect answer for shapes which are very small or very close together.
-/// 
+///
 /// Requires both shapes to be convex.
-/// 
+///
 /// # Examples
-/// 
+///
 /// ```
 /// use sepax2d::prelude::*;
-/// 
+///
 /// let square = Polygon::from_vertices((1.0, 1.0), vec![(-1.0, 1.0), (1.0, 1.0), (1.0, -1.0), (-1.0, -1.0)]);
 /// let triangle = Polygon::from_vertices((-3.5, 1.0), vec![(4.0, 0.0), (0.0, 6.0), (-4.0, 0.0)]);
-/// 
+///
 /// let aabb = AABB::new((0.0, 2.0), 2.0, 2.0);
-/// 
+///
 /// let resolution = sat_collision(&square, &triangle);
 /// //resolution = (-0.5, 0.0) up to floating point error
-/// 
+///
 /// assert!(resolution.0 + 0.5 < f32::EPSILON && resolution.0 + 0.5 > -f32::EPSILON);
 /// assert!(resolution.1 < f32::EPSILON && resolution.1 > -f32::EPSILON);
-/// 
+///
 /// let aabb_resolution = sat_collision(&aabb, &triangle);
 /// //resolution = (-0.5, 0.0) up to floating point error. aabb is a different way to
 /// //represent the same shape as square
-/// 
+///
 /// assert!(resolution.0 + 0.5 < f32::EPSILON && resolution.0 + 0.5 > -f32::EPSILON);
 /// assert!(resolution.1 < f32::EPSILON && resolution.1 > -f32::EPSILON);
-/// 
+///
 /// ```
 pub fn sat_collision(left: &(impl Shape + ?Sized), right: &(impl Shape + ?Sized)) -> (f32, f32)
 {
@@ -308,22 +320,22 @@ pub fn sat_collision(left: &(impl Shape + ?Sized), right: &(impl Shape + ?Sized)
 
 }
 
-/// Returns true if the given shape contains the specified point, and false if 
+/// Returns true if the given shape contains the specified point, and false if
 /// it does not. Does not work for degenerate polygons.
-/// 
+///
 /// This method performs a floating point comparison with Rust's built in epsilon constant, so it may
 /// return the incorrect answer for shapes which are very small or very close to the point.
-/// 
+///
 /// Requires the shape to be convex.
-/// 
+///
 /// # Examples
-/// 
+///
 /// ```
 /// use sepax2d::prelude::*;
-/// 
+///
 /// let square = Polygon::from_vertices((1.0, 1.0), vec![(-1.0, 1.0), (1.0, 1.0), (1.0, -1.0), (-1.0, -1.0)]);
 /// let triangle = Polygon::from_vertices((0.0, 0.0), vec![(2.0, 2.0), (0.0, -2.0), (-1.0, 0.0)]);
-/// 
+///
 /// assert!(contains_point(&triangle, (0.5, 0.5)));
 /// assert!(!contains_point(&square, (-2.0, 2.0)));
 /// ```
@@ -372,7 +384,7 @@ fn shape_overlap(axes: &(impl Shape + ?Sized), projected: &(impl Shape + ?Sized)
         if min_l > max_r - f32::EPSILON || min_r > max_l - f32::EPSILON
         {
 
-            return (false, 0.0, (0.0, 0.0)); 
+            return (false, 0.0, (0.0, 0.0));
 
         }
 
@@ -686,5 +698,7 @@ pub mod prelude
     pub use crate::parallelogram::Parallelogram;
 
     pub use crate::line::intersects_line;
+    pub use crate::line::intersects_ray;
+    pub use crate::line::intersects_segment;
 
 }
