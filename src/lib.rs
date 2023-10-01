@@ -145,7 +145,7 @@
 //! ```rust
 //! # use sepax2d::prelude::*;
 //!
-//! let triangle = Polygon::from_vertices((0.0, vec![(0.0, 0.0), (1.0, 1.0), (-1.0, 1.0)]));
+//! let triangle = Polygon::from_vertices((0.0, 0.0), vec![(0.0, 0.0), (1.0, 1.0), (-1.0, 1.0)]);
 //!
 //! assert!(intersects_segment(&triangle, (2.0, 0.5), (-2.0, 0.5)));
 //! ```
