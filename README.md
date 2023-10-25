@@ -46,7 +46,7 @@ Use the `sat_collision(&left, &right)` method to get a `(f32, f32)` which repres
 position in order to resolve the overlap of the two shapes.
 
 ```rust
-let resolution = sat_overlap(&circle, &triangle);
+let resolution = sat_collision(&circle, &triangle);
 
 let position = triangle.position();
 triangle.set_position((position.0 + resolution.0, position.1 + resolution.1));
